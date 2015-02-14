@@ -14,3 +14,6 @@ D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\bin\Debug\elements_
 D:\универ\НИРС\к сдаче\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
 D:\универ\НИРС\к сдаче\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
 D:\универ\НИРС\к сдаче\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb

@@ -11,6 +11,7 @@ namespace MainWindow
 {
     class Query
     {
+        //test
         //private static string _connectionString = ConfigurationManager.ConnectionStrings["elementsConnectionString"].ToString();
         private static string _connectionString = "Data Source=VALERIA-PC\\SQLEXPRESS;Initial Catalog=basic_elements;Integrated Security=True";
         
