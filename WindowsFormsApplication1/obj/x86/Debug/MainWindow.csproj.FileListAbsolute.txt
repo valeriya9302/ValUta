@@ -1,0 +1,16 @@
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\MainWindow.ErrorForm.resources
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\MainWindow.Form1.resources
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\MainWindow.Properties.Resources.resources
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\bin\Debug\elements.mdf
+D:\универ\НИРС_28.10.2014\WindowsFormsApplication1\bin\Debug\elements_log.ldf
+D:\универ\НИРС\к сдаче\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+D:\универ\НИРС\к сдаче\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+D:\универ\НИРС\к сдаче\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
