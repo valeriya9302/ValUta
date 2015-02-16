@@ -17,3 +17,12 @@ D:\универ\НИРС\к сдаче\WindowsFormsApplication1\obj\x86\Debug\Wi
 C:\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
 C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
 C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.csprojResolveAssemblyReference.cache
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.ErrorForm.resources
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.Form1.resources
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.Properties.Resources.resources
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.csproj.GenerateResource.Cache
+C:\ValUta\WindowsFormsApplication1\bin\Debug\basic_elements.mdf
+C:\ValUta\WindowsFormsApplication1\bin\Debug\basic_elements_log.ldf
+C:\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb

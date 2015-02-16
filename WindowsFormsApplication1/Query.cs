@@ -13,7 +13,8 @@ namespace MainWindow
     {
         //test
         //private static string _connectionString = ConfigurationManager.ConnectionStrings["elementsConnectionString"].ToString();
-        private static string _connectionString = "Data Source=VALERIA-PC\\SQLEXPRESS;Initial Catalog=basic_elements;Integrated Security=True";
+        //private static string _connectionString = "Data Source=VALERIA-PC\\SQLEXPRESS;Initial Catalog=basic_elements;Integrated Security=True";
+        private static string _connectionString = ConfigurationManager.ConnectionStrings["basic_elementsConnectionString"].ToString();
         
         public static List<string> SendQuerySelect(string querySring)
         {

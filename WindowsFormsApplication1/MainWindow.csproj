@@ -67,12 +67,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="elements.cs" />
-    <Compile Include="elementsDataSet.Designer.cs">
+    <Compile Include="basic_elementsDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>elementsDataSet.xsd</DependentUpon>
+      <DependentUpon>basic_elementsDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="elements.cs" />
     <Compile Include="ErrorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -108,16 +108,16 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="elementsDataSet.xsc">
-      <DependentUpon>elementsDataSet.xsd</DependentUpon>
+    <None Include="basic_elementsDataSet.xsc">
+      <DependentUpon>basic_elementsDataSet.xsd</DependentUpon>
     </None>
-    <None Include="elementsDataSet.xsd">
+    <None Include="basic_elementsDataSet.xsd">
       <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>elementsDataSet.Designer.cs</LastGenOutput>
+      <LastGenOutput>basic_elementsDataSet.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
-    <None Include="elementsDataSet.xss">
-      <DependentUpon>elementsDataSet.xsd</DependentUpon>
+    <None Include="basic_elementsDataSet.xss">
+      <DependentUpon>basic_elementsDataSet.xsd</DependentUpon>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -167,12 +167,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="elements.mdf">
+    <Content Include="basic_elements.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="elements_log.ldf">
+    <Content Include="basic_elements_log.ldf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>elements.mdf</DependentUpon>
+      <DependentUpon>basic_elements.mdf</DependentUpon>
     </Content>
   </ItemGroup>
   <ItemGroup>
