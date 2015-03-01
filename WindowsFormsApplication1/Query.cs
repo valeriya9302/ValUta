@@ -16,9 +16,9 @@ namespace MainWindow
         //private static string _connectionString = "Data Source=VALERIA-PC\\SQLEXPRESS;Initial Catalog=basic_elements;Integrated Security=True";
         private static string _connectionString = ConfigurationManager.ConnectionStrings["basic_elementsConnectionString"].ToString();
         
-        public static List<string> SendQuerySelect(string querySring)
+        public static List<List<string>> SendQuerySelect(string querySring)
         {
-            var response = new List<string>();
+            var response = new List<List<string>>();
             using (var connection = new SqlConnection(_connectionString))
             {
                 var comand = new SqlCommand(querySring, connection);
@@ -28,11 +28,15 @@ namespace MainWindow
                     var reader = comand.ExecuteReader();
                     while (reader.Read())
                     {
+                        List<string> tresponse = new List<string>();
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
                             //Console.Write(reader[i]+"\t");
-                            response.Add(reader[i].ToString());
+                            //response.Add(reader[i].ToString());
+                            tresponse.Add(reader[i].ToString());
                         }
+                        if (tresponse.Count > 0)
+                            response.Add(tresponse);
                         //Console.WriteLine();
                     }
                     reader.Close();

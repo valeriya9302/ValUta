@@ -8,8 +8,41 @@ namespace MainWindow
 {
     class elements
     {
-        private struct Elems
+        public struct Elems
         {
+            public int id;
+            public int eid;
+            public string name;
+            public string prefix;
+            //public List<int> disp;
+            public List<string> param;
+            public int image_id;
+            /*public Elems(int _id, int _eid, string _name, string _prefix)
+            {
+                id = _id;
+                eid = _eid;
+                name = _name;
+                prefix = _prefix;
+            }*/
+            public Elems(List<string> str, int img_id = -1)
+            {
+                int i = 0;
+                param = new List<string>();
+                id = Convert.ToInt32(str[i++]);
+                eid = Convert.ToInt32(str[i++]);
+                name = str[i++];
+                prefix = str[i++];
+                i++;
+                for (int ii = i; ii < str.Count; ii++)
+                {
+                    param.Add(str[ii]);
+                }
+                image_id = img_id;
+            }
+            public string toString()
+            {
+                return id + " " + name + " " + prefix;
+            }
         };
         private struct Struct
         {
@@ -30,7 +63,7 @@ namespace MainWindow
             }
         };
         private Tree<Struct> _struct;
-        //private List<Elems> _elems;
+        public List<Elems> _elems = new List<Elems>();
 
         public elements()
         {
@@ -65,9 +98,11 @@ namespace MainWindow
 
         private Tree<Struct> LoadTree(Tree<Struct> __struct, int oldPid)
         {
-            List<string> str = Query.SendQuerySelect("SELECT * FROM [" + __struct.Value.ntname + "]");
-            for(int i = 0; i < str.Count;)
+            List<List<string>> fstr = Query.SendQuerySelect("SELECT * FROM [" + __struct.Value.ntname + "]");
+            foreach(List<string> str in fstr)
+            //for(int i = 0; i < str.Count;)
             {
+                int i = 0;
                 Struct tValue = new Struct(Convert.ToInt32(str[i++]), Convert.ToInt32(str[i++]), str[i++], str[i++], str[i++], str[i++]);
                 if (tValue.pid != oldPid)
                     continue;
@@ -115,6 +150,23 @@ namespace MainWindow
                 }
             }
             return __struct.Value.etname;
+        }
+
+        public List<Elems> getElements(string[] patch)
+        {
+            _elems.Clear();
+            List<List<string>> fstr = Query.SendQuerySelect("SELECT * FROM [" + getEtname(patch) + "]");
+            foreach(List<string> str in fstr)
+            //for (int i = 0; i < str.Count; )
+            {
+                Elems tValue = new Elems(str);
+                List<List<string>> img = Query.SendQuerySelect("SELECT IMAGE_ID FROM [image_manager] WHERE (EID = " + tValue.eid + ")");
+                if(img.Count != 0 && img[0].Count != 0)
+                    tValue.image_id = Convert.ToInt32(img[0][0]);
+                //_elems.Add(tValue);
+                _elems.Add(tValue);
+            }
+            return _elems;
         }
     }
 }

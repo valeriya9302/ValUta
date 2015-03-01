@@ -12,6 +12,7 @@ namespace MainWindow
     public partial class Form1 : Form
     {
         private elements db = new elements();
+        private Images _images = new Images();
 
         public Form1()
         {
@@ -92,7 +93,9 @@ namespace MainWindow
 
         private void treeView1_MouseUp(object sender, MouseEventArgs e)
         {
-            comboBox1.Items.Add("123");
+            comboBox1.Items.Clear();
+            pictureBox1.CreateGraphics().Clear(Color.Black);
+            comboBox1.SelectedIndex = -1;
             // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
             {
@@ -119,7 +122,10 @@ namespace MainWindow
                 if (node != null && node.Nodes.Count == 0)
                 {
                     treeView1.SelectedNode = node;
-                    MessageBox.Show(db.getEtname(node.FullPath.Split('/')));
+                    //MessageBox.Show(db.getEtname(node.FullPath.Split('/')));
+                    List<elements.Elems> lst = db.getElements(node.FullPath.Split('/'));
+                    foreach (elements.Elems temp in lst)
+                        comboBox1.Items.Add(temp.toString());
                     //cms_el_gr.Show(treeView1, p);
                 }
                 return;
@@ -129,6 +135,20 @@ namespace MainWindow
         private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
             MessageBox.Show(e.Label);
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            //Pen pen = new Pen(Color.Red, 3);
+            //e.Graphics.DrawRectangle(pen, 3, 3, 10, 30);
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //MessageBox.Show(comboBox1.SelectedIndex.ToString());
+            //MessageBox.Show(db._elems[comboBox1.SelectedIndex].image_id.ToString());
+            //Тут рисуем картинкку на панели, при переключении перезагрузка
+            _images.Paint(new Pen(Color.Red), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
         }
     }
 }
