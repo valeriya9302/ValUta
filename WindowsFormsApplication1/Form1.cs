@@ -69,7 +69,7 @@ namespace MainWindow
         private void группуToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Создание группы элементов в подгруппе
-            treeView1.SelectedNode = treeView1.SelectedNode.Nodes.Add("new group");
+            treeView1.SelectedNode = treeView1.SelectedNode.Nodes.Add("new group (in group)");
             treeView1.SelectedNode.BeginEdit();
         }
 
@@ -92,10 +92,10 @@ namespace MainWindow
 
         private void treeView1_MouseUp(object sender, MouseEventArgs e)
         {
+            comboBox1.Items.Add("123");
             // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
             {
-
                 // Point where the mouse is clicked.
                 Point p = new Point(e.X, e.Y);
 
@@ -106,6 +106,23 @@ namespace MainWindow
                     treeView1.SelectedNode = node;
                     cms_el_gr.Show(treeView1, p);
                 }
+                return;
+            }
+            // Load elements from database for category
+            if (e.Button == MouseButtons.Left)
+            {
+                // Point where the mouse is clicked.
+                Point p = new Point(e.X, e.Y);
+
+                // Get the node that the user has clicked.
+                TreeNode node = treeView1.GetNodeAt(p);
+                if (node != null && node.Nodes.Count == 0)
+                {
+                    treeView1.SelectedNode = node;
+                    MessageBox.Show(db.getEtname(node.FullPath.Split('/')));
+                    //cms_el_gr.Show(treeView1, p);
+                }
+                return;
             }
         }
 

@@ -99,5 +99,22 @@ namespace MainWindow
                 res.Add(_temp.Value.name);
             return res;
         }
+
+        public string getEtname(string[] patch)
+        {
+            Tree<Struct> __struct = _struct; 
+            foreach (string name in patch)
+            {
+                foreach (Tree<Struct> temp in __struct.Children)
+                {
+                    if (temp.Value.name.Equals(name))
+                    {
+                        __struct = temp;
+                        break;
+                    }
+                }
+            }
+            return __struct.Value.etname;
+        }
     }
 }
