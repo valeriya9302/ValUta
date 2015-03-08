@@ -18,4 +18,6 @@ namespace MainWindow
             Application.Run(new Form1());
         }
     }
+
+    // Не логично такое делать на полудохлой стационарке
 }

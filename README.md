@@ -1,2 +1,3 @@
 # ValUta
 valuta_nirs
+У меня проблема с отсутствием  System.Data.SqlServerCe. Хотя скорее всего это из-за разницы в версиях 

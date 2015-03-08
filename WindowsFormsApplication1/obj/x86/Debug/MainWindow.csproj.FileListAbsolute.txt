@@ -26,3 +26,6 @@ C:\ValUta\WindowsFormsApplication1\bin\Debug\basic_elements.mdf
 C:\ValUta\WindowsFormsApplication1\bin\Debug\basic_elements_log.ldf
 C:\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
 C:\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\Цифры\Documents\GitHub\ValUta\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+C:\Users\Цифры\Documents\GitHub\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\Цифры\Documents\GitHub\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
