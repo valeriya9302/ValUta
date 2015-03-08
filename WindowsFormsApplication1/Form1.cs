@@ -148,7 +148,7 @@ namespace MainWindow
             //MessageBox.Show(comboBox1.SelectedIndex.ToString());
             //MessageBox.Show(db._elems[comboBox1.SelectedIndex].image_id.ToString());
             //Тут рисуем картинкку на панели, при переключении перезагрузка
-            _images.Paint(new Pen(Color.Red), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
+            _images.Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
         }
     }
 }

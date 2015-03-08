@@ -141,7 +141,7 @@ namespace MainWindow
         {
             if (index == -1)
                 return;
-            //gr.PageUnit = GraphicsUnit.Millimeter;
+            gr.PageUnit = GraphicsUnit.Millimeter;
             offsetX = 10;
             offsetY = 10;
             //gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality
