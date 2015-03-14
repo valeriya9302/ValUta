@@ -8,42 +8,6 @@ namespace MainWindow
 {
     class elements
     {
-        public struct Elems
-        {
-            public int id;
-            public int eid;
-            public string name;
-            public string prefix;
-            //public List<int> disp;
-            public List<string> param;
-            public int image_id;
-            /*public Elems(int _id, int _eid, string _name, string _prefix)
-            {
-                id = _id;
-                eid = _eid;
-                name = _name;
-                prefix = _prefix;
-            }*/
-            public Elems(List<string> str, int img_id = -1)
-            {
-                int i = 0;
-                param = new List<string>();
-                id = Convert.ToInt32(str[i++]);
-                eid = Convert.ToInt32(str[i++]);
-                name = str[i++];
-                prefix = str[i++];
-                i++;
-                for (int ii = i; ii < str.Count; ii++)
-                {
-                    param.Add(str[ii]);
-                }
-                image_id = img_id;
-            }
-            public string toString()
-            {
-                return id + " " + name + " " + prefix;
-            }
-        };
         private struct Struct
         {
             public int id;

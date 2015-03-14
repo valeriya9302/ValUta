@@ -73,6 +73,7 @@
       <DependentUpon>basic_elementsDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="elements.cs" />
+    <Compile Include="Elems.cs" />
     <Compile Include="ErrorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +86,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Image.cs" />
     <Compile Include="Images.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

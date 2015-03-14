@@ -12,7 +12,7 @@ namespace MainWindow
     public partial class Form1 : Form
     {
         private elements db = new elements();
-        private Images _images = new Images();
+        //private Images _images = new Images();
 
         public Form1()
         {
@@ -123,8 +123,8 @@ namespace MainWindow
                 {
                     treeView1.SelectedNode = node;
                     //MessageBox.Show(db.getEtname(node.FullPath.Split('/')));
-                    List<elements.Elems> lst = db.getElements(node.FullPath.Split('/'));
-                    foreach (elements.Elems temp in lst)
+                    List<Elems> lst = db.getElements(node.FullPath.Split('/'));
+                    foreach (Elems temp in lst)
                         comboBox1.Items.Add(temp.toString());
                     //cms_el_gr.Show(treeView1, p);
                 }
@@ -148,7 +148,11 @@ namespace MainWindow
             //MessageBox.Show(comboBox1.SelectedIndex.ToString());
             //MessageBox.Show(db._elems[comboBox1.SelectedIndex].image_id.ToString());
             //Тут рисуем картинкку на панели, при переключении перезагрузка
-            _images.Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
+            //_images.at(db._elems[comboBox1.SelectedIndex].image_id).Paint(new Pen(Color.White), pictureBox1.CreateGraphics());
+            //_images.Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
+            Graphics gr = pictureBox1.CreateGraphics();
+            db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), gr, pictureBox1.Width / 2, pictureBox1.Height / 2);
+            //MessageBox.Show("x="+pictureBox1.Width.ToString());
         }
     }
 }

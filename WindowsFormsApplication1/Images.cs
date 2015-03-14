@@ -84,6 +84,7 @@ namespace MainWindow
             //List<Text> strings;
             List<Rectangle> rectangles;
             List<Join> joins;
+            Rectangle border;
             public Struct(List<string> str)
             {
                 string[] tstr;
@@ -112,6 +113,8 @@ namespace MainWindow
                 tstr = str[i++].Split(';'); //for rectangle
                 for (int ti = 0; ti < tstr.Length; ti++)
                     joins.Add(new Join(tstr[ti]));
+
+                border = new Rectangle();
             }
             public void Paint(Pen pen, Graphics gr)
             {
@@ -137,11 +140,11 @@ namespace MainWindow
             }
         }
 
-        public void Paint(Pen pen, Graphics gr, int index)
+        public Struct at(int index)
         {
             if (index == -1)
-                return;
-            gr.PageUnit = GraphicsUnit.Millimeter;
+                return new Struct();
+            //gr.PageUnit = GraphicsUnit.Millimeter;
             offsetX = 10;
             offsetY = 10;
             //gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality
@@ -149,10 +152,10 @@ namespace MainWindow
             {
                 if (img.id == index)
                 {
-                    img.Paint(pen, gr);
-                    return;
+                    return img;
                 }
             }
+            return new Struct();
         }
     }
 }
