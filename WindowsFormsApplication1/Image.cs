@@ -13,7 +13,7 @@ namespace MainWindow
         {
         }
 
-        private struct Line
+        private class Line
         {
             public int x1, y1, x2, y2;
             public Line(string str)
@@ -28,6 +28,15 @@ namespace MainWindow
             {
                 gr.DrawLine(pen, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
             }
+            public void rotate(double angle)
+            {
+                int x1o = x1;
+                int x2o = x2;
+                x1 = (int)((x1o) * Math.Cos(angle) - (y1) * Math.Sin(angle));
+                x2 = (int)((x2o) * Math.Cos(angle) - (y2) * Math.Sin(angle));
+                y1 = (int)((x1o) * Math.Sin(angle) + (y1) * Math.Cos(angle));
+                y2 = (int)((x2o) * Math.Sin(angle) + (y2) * Math.Cos(angle));
+            }
         }
 
         private struct Arrow
@@ -38,7 +47,7 @@ namespace MainWindow
         {
         }
 
-        private struct Rectangle
+        private class Rectangle
         {
             public int x, y, width, height;
             public Rectangle(string str)
@@ -59,6 +68,24 @@ namespace MainWindow
             public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
                 gr.DrawRectangle(pen, x + offsetX, y + offsetY, width, height);
+            }
+            public void rotate(int rot)
+            {
+                if (rot == 0)
+                    return;
+                int x0 = x;
+                int y0 = y;
+                if (rot > 0)
+                {
+                    x = -y0 - height;
+                    y = x0;
+                    width += height;
+                    height = width - height;
+                    width -= height;
+                }
+                else
+                {
+                }
             }
         }
 
@@ -155,6 +182,22 @@ namespace MainWindow
 
                 isLoad = true;
             }
+        }
+
+        public void LeftRotate()
+        {
+        }
+
+        public void RightRotate()
+        {
+            double angle = Math.PI * 90.0 / 180.0;
+            Console.WriteLine(angle);
+            /*foreach(Line line in lines)
+            {
+                line.rotate(angle);
+            }*/
+            foreach (Rectangle rect in rectangles)
+                rect.rotate(1);
         }
     }
 }

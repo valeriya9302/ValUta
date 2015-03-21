@@ -154,5 +154,20 @@ namespace MainWindow
             db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), gr, pictureBox1.Width / 2, pictureBox1.Height / 2);
             //MessageBox.Show("x="+pictureBox1.Width.ToString());
         }
+
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            //Повернуть по часовой
+            if (comboBox1.SelectedIndex == -1)
+                return;
+            db._elems[comboBox1.SelectedIndex].image.RightRotate();
+            pictureBox1.CreateGraphics().Clear(Color.Black);
+            db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), pictureBox1.Width / 2, pictureBox1.Height / 2);
+        }
     }
 }
