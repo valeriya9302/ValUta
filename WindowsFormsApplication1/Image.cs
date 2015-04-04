@@ -8,6 +8,39 @@ namespace MainWindow
 {
     class Image
     {
+        public Image(Image img)
+        {
+            id = img.id;
+            ffs = img.ffs;
+            ////arcs
+            
+            lines = new List<Line>();
+            foreach (Line line in img.lines)
+                lines.Add(new Line(line));
+            
+            ////arrows
+            ////strings
+            
+            rectangles = new List<Rectangle>();
+            foreach (Rectangle rect in img.rectangles)
+                rectangles.Add(new Rectangle(rect));
+
+            joins = new List<Join>();
+            foreach (Join join in img.joins)
+                joins.Add(new Join(join));
+
+            border = new Rectangle(img.border);
+            
+            isLoad = img.isLoad;
+            Height = img.Height;
+            Width = img.Width;
+        }
+
+        public Image(int _id)
+        {
+            id = _id;
+            load();
+        }
 
         private struct Arc
         {
@@ -23,6 +56,13 @@ namespace MainWindow
                 y1 = Convert.ToInt32(tstr[1]);
                 x2 = Convert.ToInt32(tstr[2]);
                 y2 = Convert.ToInt32(tstr[3]);
+            }
+            public Line(Line line)
+            {
+                x1 = line.x1;
+                y1 = line.y1;
+                x2 = line.x2;
+                y2 = line.y2;
             }
             public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
@@ -65,6 +105,13 @@ namespace MainWindow
                 width = _w;
                 height = _h;
             }
+            public Rectangle(Rectangle rect)
+            {
+                x = rect.x;
+                y = rect.y;
+                width = rect.width;
+                height = rect.height;
+            }
             public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
                 gr.DrawRectangle(pen, x + offsetX, y + offsetY, width, height);
@@ -100,6 +147,13 @@ namespace MainWindow
                 width = 2;
                 height = 2;
             }
+            public Join(Join join)
+            {
+                x = join.x;
+                y = join.y;
+                width = join.width;
+                height = join.height;
+            }
             public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
                 gr.DrawEllipse(pen, x + offsetX, y + offsetY, width, height);
@@ -116,6 +170,8 @@ namespace MainWindow
         List<Join> joins;
         Rectangle border;
         public bool isLoad = false;
+        public int Height { set; get; }
+        public int Width { set; get; }
 
         public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
         {
@@ -179,6 +235,8 @@ namespace MainWindow
                     joins.Add(new Join(tstr[ti]));
 
                 border = new Rectangle(0, 0, maxX, maxY);
+                Height = 2 * maxY;
+                Width = 2 * maxX;
 
                 isLoad = true;
             }

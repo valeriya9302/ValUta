@@ -74,7 +74,7 @@ namespace MainWindow
                         return;
                     case 1:
             //MessageBox.Show("this");
-            ElemPictureBox temp = new ElemPictureBox(timg);
+            ElemPictureBox temp = new ElemPictureBox(new Elems(timg));
             temp.setLocation(e.Location);
             lepb.Add(temp);
             Controls.Add(temp);

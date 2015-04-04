@@ -124,9 +124,10 @@ namespace MainWindow
             //for (int i = 0; i < str.Count; )
             {
                 Elems tValue = new Elems(str);
-                List<List<string>> img = Query.SendQuerySelect("SELECT IMAGE_ID FROM [image_manager] WHERE (EID = " + tValue.eid + ")");
+                //FIXME
+                /*List<List<string>> img = Query.SendQuerySelect("SELECT IMAGE_ID FROM [image_manager] WHERE (EID = " + tValue.eid + ")");
                 if(img.Count != 0 && img[0].Count != 0)
-                    tValue.image_id = Convert.ToInt32(img[0][0]);
+                    tValue.image_id = Convert.ToInt32(img[0][0]);*/
                 //_elems.Add(tValue);
                 _elems.Add(tValue);
             }

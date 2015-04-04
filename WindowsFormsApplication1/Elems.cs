@@ -32,8 +32,13 @@ namespace MainWindow
             {
                 param.Add(str[ii]);
             }
-            image_id = img_id;
-            image = new Image();
+            //image_id = img_id;
+            //FIXME
+            List<List<string>> img = Query.SendQuerySelect("SELECT IMAGE_ID FROM [image_manager] WHERE (EID = " + eid + ")");
+            if (img.Count != 0 && img[0].Count != 0)
+                image_id = Convert.ToInt32(img[0][0]);
+            image = new Image(image_id);
+            //image = new Image();
         }
 
         public Elems(Elems elem)
@@ -44,7 +49,7 @@ namespace MainWindow
             prefix = elem.prefix;
             param = elem.param;
             image_id = elem.image_id;
-            image = elem.image;
+            image = new Image(elem.image);
         }
 
         public string toString()
