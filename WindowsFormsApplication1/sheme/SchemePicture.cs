@@ -16,15 +16,18 @@ namespace MainWindow
             MouseDown += new MouseEventHandler(EventMouseDown);
             MouseLeave += new EventHandler(EventMouseLeave);
             MouseEnter += new EventHandler(EventMouseEnter);
+            SizeChanged += new EventHandler(EventSizeChanged);
             lepb = new List<ElemPictureBox>();
-            gr = CreateGraphics();
+            //gr = CreateGraphics();
             cursorMode = new int[2]; 
             cursorMode[0] = 0;
             cursorMode[1] = 0;
+            maskSize = 10;
+            rePaint();
         }
 
         private Graphics gr;
-        private List<Elems> imgs = new List<Elems>();
+        //private List<Elems> imgs = new List<Elems>();
         private Elems timg;
         /**
          * Режим курсора
@@ -32,9 +35,12 @@ namespace MainWindow
          * 1 - Расстановка новых элементов
          **/
         private int[] cursorMode;
+        /**
+         * Размер маски в пикселях
+         **/
+        public int maskSize { set; get; }
 
-        //test
-        private ElemPictureBox epb;
+        //private ElemPictureBox epb;
         private List<ElemPictureBox> lepb;
         
 
@@ -102,7 +108,7 @@ namespace MainWindow
         {
             if (cursorMode[0] == 1)
             {
-                Clear();
+                Refresh();
                 //Controls.RemoveAt(Controls.Count - 1);
                 //epb.Dispose();
             }
@@ -132,22 +138,49 @@ namespace MainWindow
             }*/
             if (cursorMode[0] != 1 || timg == null)
                 return;
-            Clear();
+            Refresh();
             //rePaint();
             //Refresh();
             timg.Paint(new Pen(Color.Black), this.CreateGraphics(), e.X, e.Y); 
             //this.Cursor = new Cursor
         }
 
-        public void rePaint()
+        public void EventSizeChanged(object sender, EventArgs e)
         {
-            foreach (Elems el in imgs)
-                el.Paint(new Pen(Color.Black), this.CreateGraphics());
+            Bitmap flag = new Bitmap(Size.Width, Size.Height);
+            this.Image = flag;
+            Graphics gfx = Graphics.FromImage(this.Image);
+            gfx.Clear(Color.MintCream);
+            Pen pen = new Pen(Color.Gray);
+            for (int i = 0; i < Size.Height; i += maskSize)
+            {
+                gfx.DrawLine(pen, 0, i, Size.Width, i);
+            }
+            for (int i = 0; i < Size.Width; i += maskSize)
+                gfx.DrawLine(pen, i, 0, i, Size.Height);
         }
 
-        public void Clear()
+        public void rePaint()
+        {
+            //foreach (Elems el in imgs)
+            //    el.Paint(new Pen(Color.Black), this.CreateGraphics());
+            Bitmap flag = new Bitmap(Size.Width, Size.Height);
+            this.Image = flag;
+            Graphics gfx = Graphics.FromImage(this.Image);
+            gfx.Clear(Color.MintCream);
+            Pen pen = new Pen(Color.Gray);
+            for (int i = 0; i < Size.Height; i += maskSize)
+            {
+                gfx.DrawLine(pen, 0, i, Size.Width, i);
+            }
+            for (int i = 0; i < Size.Width; i += maskSize)
+                gfx.DrawLine(pen, i, 0, i, Size.Height);
+        }
+
+        /*public void Clear()
         {
             this.CreateGraphics().Clear(BackColor);
-        }
+            rePaint();
+        }*/
     }
 }
