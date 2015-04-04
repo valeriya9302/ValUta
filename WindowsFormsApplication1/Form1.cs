@@ -53,7 +53,7 @@ namespace MainWindow
             //новая вкладка
             int new_last = tabControl1.TabPages.Count;
             tabControl1.TabPages.Add(String.Format("default {0}", new_last + 1));
-            tabControl1.TabPages[new_last].Controls.Add(panel1);
+            //tabControl1.TabPages[new_last].Controls.Add(panel1);
             //Делаем её активной
             tabControl1.SelectedIndex = new_last;
             return new_last;
@@ -152,6 +152,7 @@ namespace MainWindow
             //_images.Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
             Graphics gr = pictureBox1.CreateGraphics();
             db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), gr, pictureBox1.Width / 2, pictureBox1.Height / 2);
+            schemePicture1.SetImage(db._elems[comboBox1.SelectedIndex]);
             //MessageBox.Show("x="+pictureBox1.Width.ToString());
         }
 

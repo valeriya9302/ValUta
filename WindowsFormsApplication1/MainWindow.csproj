@@ -91,6 +91,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query.cs" />
+    <Compile Include="sheme\ElemPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="sheme\SchemePicture.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Tree.cs" />
     <EmbeddedResource Include="ErrorForm.resx">
       <DependentUpon>ErrorForm.cs</DependentUpon>

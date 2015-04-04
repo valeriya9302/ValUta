@@ -15,6 +15,8 @@ namespace MainWindow
         //public List<int> disp;
         private List<string> param;
         public int image_id { get; set; }
+        public int posX { get; set; }
+        public int posY { get; set; }
         public Image image;
 
         public Elems(List<string> str, int img_id = -1)
@@ -34,6 +36,17 @@ namespace MainWindow
             image = new Image();
         }
 
+        public Elems(Elems elem)
+        {
+            id = elem.id;
+            eid = elem.eid;
+            name = elem.name;
+            prefix = elem.prefix;
+            param = elem.param;
+            image_id = elem.image_id;
+            image = elem.image;
+        }
+
         public string toString()
         {
             return id + " " + name + " " + prefix;
@@ -42,7 +55,7 @@ namespace MainWindow
         public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
         {
             image.id = image_id;
-            image.Paint(pen, gr, offsetX, offsetY);
+            image.Paint(pen, gr, offsetX + posX, offsetY + posY);
         }
     }
 }
