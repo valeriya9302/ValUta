@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace MainWindow
 {
@@ -34,6 +36,21 @@ namespace MainWindow
             isLoad = img.isLoad;
             Height = img.Height;
             Width = img.Width;
+
+            RefreshRegion();
+        }
+
+        public void RefreshRegion()
+        {
+            GraphicsPath newReg = new GraphicsPath();
+            /*foreach (Line line in lines)
+            {
+                newReg.AddLine(line.x1 + 10, line.y1 + 10, line.x2 + 10, line.y2 + 10);
+                newReg.AddLine(line.x2 + 10, line.y2 + 10, line.x1 + 10, line.y1 + 10);
+            }*/
+            foreach (Rectangle rect in rectangles)
+                newReg.AddRectangle(new System.Drawing.Rectangle(rect.x+10, rect.y+10, rect.width, rect.height));
+            region = new Region(newReg);
         }
 
         public Image(int _id)
@@ -136,9 +153,9 @@ namespace MainWindow
             }
         }
 
-        private struct Join
+        public class Join : Control
         {
-            int x, y, width, height;
+            public int x, y, width, height;
             public Join(string str)
             {
                 string[] tstr = str.Split(',');
@@ -146,6 +163,11 @@ namespace MainWindow
                 y = Convert.ToInt32(tstr[1]) - 1;
                 width = 2;
                 height = 2;
+                Width = 2;
+                Height = 2;
+                Location = new Point(x, y);
+                //Region = new Region(new System.Drawing.Rectangle(x, y, width, height));
+                MouseEnter += new EventHandler(EventMouseEnter);
             }
             public Join(Join join)
             {
@@ -154,9 +176,15 @@ namespace MainWindow
                 width = join.width;
                 height = join.height;
             }
-            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void tPaint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
                 gr.DrawEllipse(pen, x + offsetX, y + offsetY, width, height);
+                Location = new Point(x + offsetX, y + offsetY);
+                BringToFront();
+            }
+            public void EventMouseEnter(object sender, EventArgs e)
+            {
+                MessageBox.Show("123");
             }
         }
 
@@ -167,11 +195,12 @@ namespace MainWindow
         //List<Arrow> arrows;
         //List<Text> strings;
         List<Rectangle> rectangles;
-        List<Join> joins;
+        public List<Join> joins;
         Rectangle border;
         public bool isLoad = false;
         public int Height { set; get; }
         public int Width { set; get; }
+        private Region region;
 
         public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
         {
@@ -179,11 +208,11 @@ namespace MainWindow
                 load();
 
             foreach (Line line in lines)
-                line.Paint(pen, gr, offsetX - border.width / 2, offsetY - border.height / 2);
+                line.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
             foreach (Rectangle rect in rectangles)
-                rect.Paint(pen, gr, offsetX - border.width / 2, offsetY - border.height / 2);
-            //foreach (Join join in joins)
-            //    join.Paint(pen, gr);
+                rect.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+            foreach (Join join in joins)
+                join.tPaint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
 
             //border.Paint(pen, gr, offsetX - border.width / 2, offsetY - border.height / 2);
         }
@@ -195,7 +224,7 @@ namespace MainWindow
             {
                 string[] tstr;
                 int i = 0;
-                int maxX = 0, maxY = 0;
+                int maxX = 0, maxY = 0, minX = 0;
                 id = Convert.ToInt32(str[i++]);
                 ffs = str[i++];
 
@@ -209,8 +238,10 @@ namespace MainWindow
                     Line line = new Line(tstr[ti]);
                     maxX = (maxX < line.x1) ? line.x1 : maxX;
                     maxX = (maxX < line.x2) ? line.x2 : maxX;
-                    maxY = (maxY < line.x1) ? line.y1 : maxY;
-                    maxY = (maxY < line.x2) ? line.y2 : maxY;
+                    maxY = (maxY < line.y1) ? line.y1 : maxY;
+                    maxY = (maxY < line.y2) ? line.y2 : maxY;
+                    minX = (minX > line.x1) ? line.x1 : minX;
+                    minX = (minX > line.x2) ? line.x2 : minX;
                     lines.Add(line);
                 }
 
@@ -234,7 +265,7 @@ namespace MainWindow
                 for (int ti = 0; ti < tstr.Length; ti++)
                     joins.Add(new Join(tstr[ti]));
 
-                border = new Rectangle(0, 0, maxX, maxY);
+                border = new Rectangle(0, 0, maxX - minX, maxY);
                 Height = 2 * maxY;
                 Width = 2 * maxX;
 
@@ -256,6 +287,12 @@ namespace MainWindow
             }*/
             foreach (Rectangle rect in rectangles)
                 rect.rotate(1);
+        }
+
+        public Region getRegion()
+        {
+            RefreshRegion();
+            return region;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace MainWindow.sheme
@@ -26,8 +27,15 @@ namespace MainWindow.sheme
             MouseLeave += new EventHandler(EventMouseLeave);
             BackColor = Color.DeepPink;
             pen = new Pen(Color.Black);
-            Height = elem.image.Height;
+            Height = elem.image.Height + 2;
             Width = elem.image.Width;
+            /*foreach (Image.Join join in elem.image.joins)
+            {
+                Controls.Add(join);
+                join.Parent = this;
+                join.BackColor = Color.Red;
+                join.BringToFront();
+            }*/
         }
 
         public void setLocation(Point pos)
@@ -40,11 +48,16 @@ namespace MainWindow.sheme
 
         public void repaint()
         {
+            //newReg - Задать регион объекта, тогда все будет заебись
+            // Сначала требуется продумать рисование фигуры
+
+            //Region = new Region(elem.image.getRegion().GetRegionData());
+
             Bitmap flag = new Bitmap(Width, Height);
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
-            gfx.Clear(Color.White);
-            elem.Paint(pen, gfx, Width / 2, Height / 2);
+            gfx.Clear(Color.Azure);
+            elem.Paint(pen, gfx, 0, 2);
             //BringToFront();
         }
 
@@ -57,7 +70,19 @@ namespace MainWindow.sheme
         public void EventMouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
-                setLocation(new Point(Location.X - oldPos.X + e.X, Location.Y - oldPos.Y + e.Y));
+            {
+                setLocation(new Point(
+                    (int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize,
+                    (int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.Height / 2));
+                Parent.Refresh();
+                return;
+            }
+            else
+            {
+                foreach (Image.Join join in elem.image.joins)
+                    if (Math.Abs(join.x - e.X) < 3 && Math.Abs(join.y - e.Y) < 3)
+                        MessageBox.Show("321");
+            }
         }
 
         public void EventMouseClick(object sender, MouseEventArgs e)

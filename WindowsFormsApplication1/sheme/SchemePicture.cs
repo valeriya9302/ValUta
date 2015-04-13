@@ -23,7 +23,7 @@ namespace MainWindow
             cursorMode[0] = 0;
             cursorMode[1] = 0;
             maskSize = 10;
-            rePaint();
+            //rePaint();
         }
 
         private Graphics gr;
@@ -81,9 +81,11 @@ namespace MainWindow
                     case 1:
             //MessageBox.Show("this");
             ElemPictureBox temp = new ElemPictureBox(new Elems(timg));
-            temp.setLocation(e.Location);
+            temp.setLocation(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize - timg.image.Height / 2));
             lepb.Add(temp);
             Controls.Add(temp);
+            temp.Parent = this;
+            temp.BringToFront();
             Refresh();
                         //Controls.Add(epb);
                         cursorMode[1] = cursorMode[0];
@@ -141,7 +143,9 @@ namespace MainWindow
             Refresh();
             //rePaint();
             //Refresh();
-            timg.Paint(new Pen(Color.Black), this.CreateGraphics(), e.X, e.Y); 
+            timg.Paint(new Pen(Color.Black), this.CreateGraphics(), (int)(e.X / maskSize) * maskSize, 
+                (int)(e.Y / maskSize) * maskSize - timg.image.Height / 2 + 2);
+            //timg.image.Height / 2
             //this.Cursor = new Cursor
         }
 
@@ -151,7 +155,7 @@ namespace MainWindow
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
             gfx.Clear(Color.MintCream);
-            Pen pen = new Pen(Color.Gray);
+            Pen pen = new Pen(Color.LightGray);
             for (int i = 0; i < Size.Height; i += maskSize)
             {
                 gfx.DrawLine(pen, 0, i, Size.Width, i);
@@ -160,7 +164,7 @@ namespace MainWindow
                 gfx.DrawLine(pen, i, 0, i, Size.Height);
         }
 
-        public void rePaint()
+        /*public void rePaint()
         {
             //foreach (Elems el in imgs)
             //    el.Paint(new Pen(Color.Black), this.CreateGraphics());
@@ -175,7 +179,7 @@ namespace MainWindow
             }
             for (int i = 0; i < Size.Width; i += maskSize)
                 gfx.DrawLine(pen, i, 0, i, Size.Height);
-        }
+        }*/
 
         /*public void Clear()
         {

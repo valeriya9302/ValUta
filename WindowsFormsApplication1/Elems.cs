@@ -60,7 +60,8 @@ namespace MainWindow
         public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
         {
             image.id = image_id;
-            image.Paint(pen, gr, offsetX + posX, offsetY + posY);
+            //image.Paint(pen, gr, offsetX + posX, offsetY + posY);
+            image.Paint(pen, gr, offsetX, offsetY);
         }
     }
 }
