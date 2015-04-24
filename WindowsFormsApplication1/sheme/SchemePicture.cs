@@ -26,13 +26,14 @@ namespace MainWindow
             //rePaint();
         }
 
-        private Graphics gr;
+        //private Graphics gr;
         //private List<Elems> imgs = new List<Elems>();
-        private Elems timg;
         /**
          * Режим курсора
          * 0 - Указатель
          * 1 - Расстановка новых элементов
+         * 2 - Установка проводников
+         * 3 - Добавление точек проводнику
          **/
         private int[] cursorMode;
         /**
@@ -41,12 +42,21 @@ namespace MainWindow
         public int maskSize { set; get; }
 
         //private ElemPictureBox epb;
+        private Elems timg;
         private List<ElemPictureBox> lepb;
+        private Wire twire;
+        private List<Wire> lwpb;
         
 
         public void setCursor(int cursor)
         {
-            
+            if (cursor == 2 && cursorMode[0] == 3)
+                return;
+            if (cursorMode[0] != 0)
+            {
+                cursorMode[1] = cursorMode[0];
+            }
+            cursorMode[0] = cursor;
         }
 
         public void SetImage(Elems img)
@@ -61,6 +71,17 @@ namespace MainWindow
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
+                if (cursorMode[0] == 3)
+                {
+                    if (twire.removeLast())
+                        return;
+                    else
+                    {
+                        cursorMode[0] = 0;
+                        Controls.Remove(twire);
+                    }
+                }
+                //cursorMode[0] = 0;
                 /*if (cursorMode[0] == 1)
                     Controls.RemoveAt(Controls.Count - 1);*/
                 Refresh();
@@ -79,17 +100,60 @@ namespace MainWindow
                         cursorMode[1] = 0;
                         return;
                     case 1:
-            //MessageBox.Show("this");
-            ElemPictureBox temp = new ElemPictureBox(new Elems(timg));
-            temp.setLocation(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize - timg.image.Height / 2));
-            lepb.Add(temp);
-            Controls.Add(temp);
-            temp.Parent = this;
-            temp.BringToFront();
-            Refresh();
+                        //MessageBox.Show("this");
+                        ElemPictureBox temp = new ElemPictureBox(new Elems(timg));
+                        temp.setLocation(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize - timg.image.Height / 2));
+                        lepb.Add(temp);
+                        Controls.Add(temp);
+                        temp.Parent = this;
+                        temp.BringToFront();
+                        Refresh();
                         //Controls.Add(epb);
                         cursorMode[1] = cursorMode[0];
                         cursorMode[0] = 0;
+                        return;
+                    case 2:
+                        //create wire
+                        //MessageBox.Show("Провод!!!" + e.X.ToString() + "|" + e.Y.ToString());
+                        twire = new Wire(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize), this);
+                        Controls.Add(twire);
+                        //twire.Parent = this;
+                        twire.BringToFront();
+                        Refresh();
+                        cursorMode[0] = 3;
+                        return;
+                    case 3:
+                        if (object.ReferenceEquals(sender.GetType(), typeof(ElemPictureBox)))
+                        {
+                            //end wire
+                            twire.addPoint(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize));
+                            twire.setDone();
+                            cursorMode[0] = 0;
+                            return;
+                        }
+                        if (object.ReferenceEquals(sender.GetType(), typeof(Wire)) && ((Wire)sender).isDone)
+                        {
+                            //create node
+                            Node tnode = new Node(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize), this);
+                            Controls.Add(tnode);
+                            tnode.BringToFront();
+                            //необходимо разрезать существующий провод в точке узла на 2 части и поместить в контрол
+                            twire.addPoint(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize));
+                            twire.setDone();
+                            List<Wire> tlw = ((Wire)sender).split(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize));
+                            //Controls.Remove((Wire)sender);
+                            ((Wire)sender).Dispose();
+                            foreach (Wire wire in tlw)
+                            {
+                                Controls.Add(wire);
+                                wire.BringToFront();
+                            }
+                            cursorMode[0] = 0;
+                            Refresh();
+                            return;
+                        }
+                        //add point to wire
+                        twire.addPoint(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize));
                         return;
                 }
             }
@@ -130,7 +194,7 @@ namespace MainWindow
             }*/
         }
 
-        private void EventMouseMove(object sender, MouseEventArgs e)
+        public void EventMouseMove(object sender, MouseEventArgs e)
         {
             /*if (cursorMode[0] == 1)
             {
@@ -138,6 +202,12 @@ namespace MainWindow
                 epb.setLocation(new Point(e.X, e.Y));
                 Refresh();
             }*/
+            if (cursorMode[0] == 3)
+            {
+                twire.replacePoint(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize));
+                Refresh();
+                return;
+            }
             if (cursorMode[0] != 1 || timg == null)
                 return;
             Refresh();

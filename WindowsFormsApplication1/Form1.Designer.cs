@@ -71,6 +71,7 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.schemePicture1 = new MainWindow.SchemePicture();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.создатьToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.открытьToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -102,7 +103,6 @@
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.schemePicture1 = new MainWindow.SchemePicture();
             this.cms_el_gr.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -128,9 +128,9 @@
             this.toolStrip2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).BeginInit();
             this.SuspendLayout();
             // 
             // cms_el_gr
@@ -531,6 +531,19 @@
             this.tabPage1.Text = "Default";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // schemePicture1
+            // 
+            this.schemePicture1.BackColor = System.Drawing.Color.DarkGray;
+            this.schemePicture1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.schemePicture1.Image = ((System.Drawing.Image)(resources.GetObject("schemePicture1.Image")));
+            this.schemePicture1.Location = new System.Drawing.Point(3, 3);
+            this.schemePicture1.Margin = new System.Windows.Forms.Padding(0);
+            this.schemePicture1.maskSize = 10;
+            this.schemePicture1.Name = "schemePicture1";
+            this.schemePicture1.Size = new System.Drawing.Size(669, 357);
+            this.schemePicture1.TabIndex = 0;
+            this.schemePicture1.TabStop = false;
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -777,16 +790,6 @@
             this.contextMenuStrip2.Name = "contextMenuStrip2";
             this.contextMenuStrip2.Size = new System.Drawing.Size(61, 4);
             // 
-            // schemePicture1
-            // 
-            this.schemePicture1.BackColor = System.Drawing.Color.DarkGray;
-            this.schemePicture1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.schemePicture1.Location = new System.Drawing.Point(3, 3);
-            this.schemePicture1.Name = "schemePicture1";
-            this.schemePicture1.Size = new System.Drawing.Size(669, 357);
-            this.schemePicture1.TabIndex = 0;
-            this.schemePicture1.TabStop = false;
-            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -831,11 +834,11 @@
             this.toolStrip2.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
