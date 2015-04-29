@@ -73,7 +73,7 @@
       <DependentUpon>basic_elementsDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="elements.cs" />
-    <Compile Include="sheme\Elems.cs" />
+    <Compile Include="scheme\Elems.cs" />
     <Compile Include="ErrorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,21 +86,24 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="sheme\Image.cs" />
+    <Compile Include="scheme\Image.cs" />
     <Compile Include="Images.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query.cs" />
-    <Compile Include="sheme\ElemPictureBox.cs">
+    <Compile Include="scheme\ElemPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="sheme\Node.cs">
+    <Compile Include="scheme\Node.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="sheme\SchemePicture.cs">
+    <Compile Include="scheme\SchemePicture.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="sheme\Wire.cs">
+    <Compile Include="scheme\Text.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="scheme\Wire.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Tree.cs" />
