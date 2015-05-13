@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace MainWindow.sheme
+namespace MainWindow.scheme
 {
     /**
      * Класс для рисования одного элемента на схеме
@@ -20,11 +20,26 @@ namespace MainWindow.sheme
         private bool sendParent = false;
         private bool isDone;
         public bool isMouseEnter;
-        private string name;
+        private new Size DefaultSize;
+        private Point DefaultLocation;
+        public float angle { get; set; }
+        private Image.Join Paintjoin;
+
+        public ElemPictureBox(Elems el)
+        {
+            elem = el;
+            //elem = new Elems(el);
+            BackColor = Color.DeepPink;
+            pen = new Pen(Color.Black);
+            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            angle = 0.0F;
+            Size = DefaultSize;
+        }
 
         public ElemPictureBox(Elems el, object parent)
         {
             elem = el;
+            //elem = new Elems(el);
             Parent = (Control)parent;
             MouseDown += new MouseEventHandler(EventMouseDown);
             MouseMove += new MouseEventHandler(EventMouseMove);
@@ -34,14 +49,19 @@ namespace MainWindow.sheme
             //MouseEnter += new EventHandler(((SchemePicture)Parent).EventMouseEnter);
             //MouseLeave += new EventHandler(EventMouseLeave);
             Disposed += new EventHandler(EventDisposed);
+            Resize += new EventHandler(EventResize);
+            //ResizeRedraw = true;
             BackColor = Color.DeepPink;
             pen = new Pen(Color.Black);
-            Height = elem.image.Height + 2;
-            Width = elem.image.Width;
+            //Height = elem.image.Height + 2;
+            //Width = elem.image.Width;
+            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            Size = DefaultSize;
             isDone = false;
             sendParent = false;
+            angle = 0.0F;
             text = new List<Text>();
-            name = elem.prefix;
+            //name = elem.prefix;
             /*foreach (Image.Join join in elem.image.joins)
             {
                 Controls.Add(join);
@@ -67,22 +87,25 @@ namespace MainWindow.sheme
         public void setLocation(Point pos)
         {
             Location = pos;
+            DefaultLocation = Location;
             //Refresh();
-            repaint();
+            OnPaint(null);
             Refresh();
         }
 
         public void setDone()
         {
             isDone = true;
+            elem = new Elems(elem);
             MouseClick += new MouseEventHandler(EventMouseClick);
+            MouseDoubleClick += new MouseEventHandler(EventMouseDoubleClick);
             MouseEnter += new EventHandler(EventMouseEnter);
             MouseLeave += new EventHandler(EventMouseLeave);
 
             text.Add(new Text(elem.getTextParam()));
             text[0].Parent = Parent;
             text[0].setLocation(Location);
-            text.Add(new Text(name));
+            text.Add(new Text(Name));
             text[1].Parent = Parent;
             text[1].setLocation(text[0].Location);
             /*text[0].setLocation(new Point(Location.X + Width / 2, Location.Y));
@@ -93,18 +116,74 @@ namespace MainWindow.sheme
             //text[0].Parent = Parent;
         }
 
-        public void repaint()
+        void EventMouseDoubleClick(object sender, MouseEventArgs e)
         {
-            //newReg - Задать регион объекта, тогда все будет заебись
+            EditForm ef = new EditForm(text[1].Str, text[1].Hidden);
+            if (ef.ShowDialog(this) == DialogResult.OK)
+            {
+                text[1].Str = ef.name;
+                text[1].Hidden = ef.HiddenName;
+            }
+        }
+
+        public string getPrefix()
+        {
+            return elem.prefix;
+        }
+
+        public void setScale(int scale)
+        {
+            Bitmap flag = new Bitmap(Width, Height);
+            this.Image = flag;
+            Graphics gfx = Graphics.FromImage(this.Image);
+            gfx.ScaleTransform(scale, scale);
+            //repaint();
+            Update();
+        }
+
+        /*public new void Scale(float scale)
+        {
+            Width = (int)(DefaultSize.Width * scale);
+            Height = (int)(DefaultSize.Height * scale);
+            Location = new Point((int)(DefaultLocation.X / scale), (int)(DefaultLocation.Y / scale));
+        }*/
+
+        public void setName(string name)
+        {
+            this.Name = name;
+            //OnPaint(
+        }
+
+        protected override void OnPaint(PaintEventArgs pe)
+        {
+            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            Size = DefaultSize;
+            //newReg - Задать регион объекта
             // Сначала требуется продумать рисование фигуры
 
             //Region = new Region(elem.image.getRegion().GetRegionData());
 
+            //Bitmap flag = new Bitmap(DefaultSize.Width, DefaultSize.Height);
+            if (pe != null)
+            {
+                pe.Graphics.Clear(Color.Azure);
+                //pe.Graphics.BeginContainer(new RectangleF(), new RectangleF(), GraphicsUnit.Pixel);
+                //pe.Graphics.EndContainer(pe.Graphics.BeginContainer(new RectangleF(0, 0, 1.4F, 1.4F), new RectangleF(), GraphicsUnit.Pixel));
+                pe.Graphics.ScaleTransform((float)Width / (float)DefaultSize.Width, (float)Height / (float)DefaultSize.Height);
+                //pe.Graphics.RotateTransform(angle);
+                elem.Paint(pen, pe.Graphics);
+                if (Paintjoin != null)
+                    Paintjoin.tPaint(pen, pe.Graphics);
+                //pe.Graphics.PageScale = Width / DefaultSize.Width;
+                return;
+            }
             Bitmap flag = new Bitmap(Width, Height);
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
             gfx.Clear(Color.Azure);
             elem.Paint(pen, gfx);
+            //gfx.ScaleTransform(Width / DefaultSize.Width, Height / DefaultSize.Height);
+            //this.BackgroundImage = flag;
             //BringToFront();
         }
 
@@ -118,7 +197,10 @@ namespace MainWindow.sheme
             }
             if (sendParent)
             {
-                MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, oldPos.X + Location.X, oldPos.Y + Location.Y, e.Delta);
+                //MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, oldPos.X + Location.X, oldPos.Y + Location.Y, e.Delta);
+                if (Paintjoin == null)
+                    return;
+                MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, Location.X + (int)Paintjoin.p.X + 1, Location.Y + (int)Paintjoin.p.Y + 1, e.Delta);
                 ((SchemePicture)Parent).setCursor(2);
                 ((SchemePicture)Parent).EventMouseDown(sender, ne);
                 return;
@@ -141,8 +223,8 @@ namespace MainWindow.sheme
             {
                 Point oldLocation = Location;
                 setLocation(new Point(
-                    (int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize,
-                    (int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.Height / 2));
+                    (int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.X,
+                    (int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.Y));
                 //text[0].EventMouseMove(sender, e);
                 text[0].offsetLocation(new Point(Location.X - oldLocation.X, Location.Y - oldLocation.Y));
                 text[1].offsetLocation(new Point(Location.X - oldLocation.X, Location.Y - oldLocation.Y));
@@ -159,10 +241,12 @@ namespace MainWindow.sheme
                         MessageBox.Show("321");*/
                 foreach (Image.Join join in elem.image.joins)
                 {
-                    if (Math.Abs(join.p.X - e.X) < 3.0F && Math.Abs(join.p.Y - e.Y) < 3.0F)
+                    if (Math.Abs(join.p.X + 1.0F - e.X) < 4.0F && Math.Abs(join.p.Y + 1.0F - e.Y) < 4.0F)
                     {
+                        //MessageBox.Show(join.p.ToString() + this.Size.ToString());
                         Graphics gfx = Graphics.FromImage(this.Image);
                         join.tPaint(new Pen(Color.Red), gfx);
+                        Paintjoin = join;
                         oldPos = new Point((int)join.p.X, (int)join.p.Y);
                         sendParent = true;
                     }
@@ -183,7 +267,7 @@ namespace MainWindow.sheme
             if (!isDone)
                 return;
             pen.Color = Color.MediumVioletRed;
-            repaint();
+            OnPaint(null);
         }
 
         public void EventMouseLeave(object sender, EventArgs e)
@@ -195,8 +279,29 @@ namespace MainWindow.sheme
                 return;
             }
             pen.Color = Color.Black;
+            Paintjoin = null;
             sendParent = false;
-            repaint();
+            OnPaint(null);
+        }
+
+        public void EventResize(object sender, EventArgs e)
+        {
+            //Update();
+            Refresh();
+            //OnPaint(null);
+        }
+
+        /**
+         * 1 - по часовой
+         * 2 - против
+         * 3 - отражение по горизонтали
+         * 4 - отражение по вертикали
+         **/
+        public void Rotate(int param)
+        {
+            elem.Rotate(param);
+            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            Size = DefaultSize;
         }
     }
 }

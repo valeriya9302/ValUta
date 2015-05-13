@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace MainWindow
+namespace MainWindow.scheme
 {
-    class Elems
+    public class Elems
     {
         private int id;
         public int eid { get; set; }
@@ -62,6 +62,11 @@ namespace MainWindow
             image.id = image_id;
             //image.Paint(pen, gr, offsetX + posX, offsetY + posY);
             image.Paint(pen, gr, offsetX, offsetY);
+        }
+
+        public void Rotate(int param)
+        {
+            image.Rotate(param);
         }
 
         public string getTextParam()

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using MainWindow.scheme;
 
 namespace MainWindow
 {
@@ -94,7 +95,7 @@ namespace MainWindow
         private void treeView1_MouseUp(object sender, MouseEventArgs e)
         {
             comboBox1.Items.Clear();
-            pictureBox1.CreateGraphics().Clear(Color.Black);
+            //pictureBox1.CreateGraphics().Clear(Color.Black);
             comboBox1.SelectedIndex = -1;
             // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
@@ -150,8 +151,9 @@ namespace MainWindow
             //Тут рисуем картинкку на панели, при переключении перезагрузка
             //_images.at(db._elems[comboBox1.SelectedIndex].image_id).Paint(new Pen(Color.White), pictureBox1.CreateGraphics());
             //_images.Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), db._elems[comboBox1.SelectedIndex].image_id);
-            Graphics gr = pictureBox1.CreateGraphics();
-            db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), gr, pictureBox1.Width / 2, pictureBox1.Height / 2);
+            //Graphics gr = pictureBox1.CreateGraphics();
+            //db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), gr, pictureBox1.Width / 2, pictureBox1.Height / 2);
+            this.elemPreview1.setElement(db._elems[comboBox1.SelectedIndex]);
             schemePicture1.SetImage(db._elems[comboBox1.SelectedIndex]);
             //MessageBox.Show("x="+pictureBox1.Width.ToString());
         }
@@ -167,8 +169,13 @@ namespace MainWindow
             if (comboBox1.SelectedIndex == -1)
                 return;
             db._elems[comboBox1.SelectedIndex].image.RightRotate();
-            pictureBox1.CreateGraphics().Clear(Color.Black);
-            db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), pictureBox1.Width / 2, pictureBox1.Height / 2);
+            //pictureBox1.CreateGraphics().Clear(Color.Black);
+            //db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), pictureBox1.Width / 2, pictureBox1.Height / 2);
+        }
+
+        private void tabPage1_Resize(object sender, EventArgs e)
+        {
+            //schemePicture1.MinimumSize = ((TabPage)sender).Size;
         }
     }
 }

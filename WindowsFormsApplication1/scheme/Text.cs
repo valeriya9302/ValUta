@@ -5,11 +5,26 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace MainWindow.sheme
+namespace MainWindow.scheme
 {
     class Text : PictureBox
     {
         private string str;
+        public bool Hidden { set; get; }
+        public string Str
+        {
+            set
+            {
+                Point loc = new Point(Location.X, Location.Y + Height);
+                str = value;
+                Width = 0;
+                setLocation(loc);
+            }
+            get
+            {
+                return str;
+            }
+        }
         private Color color;
         private Point oldPos;
 
@@ -62,7 +77,8 @@ namespace MainWindow.sheme
             //Height = (int)size.Height;
             //Width = (int)size.Width;
             //Location = new Point(Location.X - (int)(size.Width / 2), Location.Y - (int)size.Height - 16);
-            gfx.DrawString(str, new Font("Arial", 7), new SolidBrush(color), new PointF(0, 0));
+            if (!Hidden)
+                gfx.DrawString(str, new Font("Arial", 7), new SolidBrush(color), new PointF(0, 0));
             //BringToFront();
         }
 

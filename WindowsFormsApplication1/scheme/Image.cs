@@ -9,7 +9,7 @@ using System.Globalization;
 
 namespace MainWindow
 {
-    class Image
+    public class Image
     {
         public Image(Image img)
         {
@@ -22,7 +22,10 @@ namespace MainWindow
                 lines.Add(new Line(line));
             
             ////arrows
-            ////strings
+            
+            strings = new List<Text>();
+            foreach (Text text in img.strings)
+                strings.Add(new Text(text));
             
             rectangles = new List<Rectangle>();
             foreach (Rectangle rect in img.rectangles)
@@ -37,6 +40,8 @@ namespace MainWindow
             isLoad = img.isLoad;
             Height = img.Height;
             Width = img.Width;
+            pointRotate = new PointF(img.pointRotate.X, img.pointRotate.Y);
+            TopLeft = new Point(img.TopLeft.X, img.TopLeft.Y);
 
             RefreshRegion();
         }
@@ -71,8 +76,10 @@ namespace MainWindow
             public Line(string str)
             {
                 string[] tstr = str.Split(',');
-                sp = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
-                ep = new PointF(float.Parse(tstr[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[3], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                //sp = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                //ep = new PointF(float.Parse(tstr[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[3], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                sp = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat));
+                ep = new PointF(float.Parse(tstr[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[3], CultureInfo.InvariantCulture.NumberFormat));
                 /*x1 = Convert.ToInt32(tstr[0]);
                 y1 = Convert.ToInt32(tstr[1]);
                 x2 = Convert.ToInt32(tstr[2]);
@@ -94,16 +101,28 @@ namespace MainWindow
             public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
                 //gr.DrawLine(pen, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
-                gr.DrawLine(pen, sp, ep);
+                gr.DrawLine(pen, sp.X + 1.0F, sp.Y + 1.0F, ep.X + 1.0F, ep.Y + 1.0F);
             }
-            public void rotate(double angle)
+            public void Rotate(int param, PointF o)
             {
-                /*int x1o = x1;
-                int x2o = x2;
-                x1 = (int)((x1o) * Math.Cos(angle) - (y1) * Math.Sin(angle));
-                x2 = (int)((x2o) * Math.Cos(angle) - (y2) * Math.Sin(angle));
-                y1 = (int)((x1o) * Math.Sin(angle) + (y1) * Math.Cos(angle));
-                y2 = (int)((x2o) * Math.Sin(angle) + (y2) * Math.Cos(angle));*/
+                float sin, cos;
+                switch (param)
+                {
+                    case 1:
+                        sin = 1.0F;
+                        cos = 0.0F;
+                        break;
+                    case 2:
+                        sin = 0.0F;
+                        cos = 1.0F;
+                        break;
+                    case 3:
+                    case 4:
+                    default:
+                        return;
+                }
+                sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.X * sin + o.Y * cos);
+                ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.X * sin + o.Y * cos);
             }
         }
 
@@ -111,16 +130,38 @@ namespace MainWindow
         {
         }
 
-        private struct Text
+        private class Text
         {
+            private string str;
+            private PointF pos;
+            public Text(string str)
+            {
+                if (str.Equals(""))
+                    return;
+                string[] tstr = str.Split(',');
+                pos = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat));
+                this.str = tstr[2];
+            }
+            public Text(Text text)
+            {
+                pos = new PointF(text.pos.X, text.pos.Y);
+                str = text.str;
+            }
+            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            {
+                gr.DrawString(str, new Font("Arial", 5), new SolidBrush(pen.Color), pos);
+            }
         }
 
         private class Rectangle
         {
             public int x, y, width, height;
+            //public PointF pos, wh;
             public RectangleF rect;
             public Rectangle(string str)
             {
+                if (str.Equals(""))
+                    return;
                 string[] tstr = str.Split(',');
                 x = Convert.ToInt32(tstr[0]);
                 y = Convert.ToInt32(tstr[1]);
@@ -143,7 +184,7 @@ namespace MainWindow
             }
             public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
-                gr.DrawRectangle(pen, x, y + 1, width, height);
+                gr.DrawRectangle(pen, x + 1, y + 1, width, height);
                 //gr.DrawRectangle(
             }
             public void rotate(int rot)
@@ -164,6 +205,59 @@ namespace MainWindow
                 {
                 }
             }
+            public void Rotate(int param, PointF o)
+            {
+                PointF[] p;
+                PointF bp;
+                p = new PointF[4];
+                p[0] = new PointF(x, y);
+                p[1] = new PointF(x + width, y);
+                p[2] = new PointF(x + width, y + height);
+                p[3] = new PointF(x, y + height);
+                float sin, cos;
+                switch (param)
+                {
+                    case 1:
+                        sin = 1.0F;
+                        cos = 0.0F;
+                        break;
+                    case 2:
+                        sin = 0.0F;
+                        cos = 1.0F;
+                        break;
+                    case 3:
+                    case 4:
+                    default:
+                        return;
+                }
+                for(int i = 0; i < 4; i++)
+                    p[i] = new PointF(((p[i].X - o.X) * cos + (p[i].Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(p[i].X - o.X) * sin + (p[i].Y - o.Y) * cos + o.X * sin + o.Y * cos);
+                switch (param)
+                {
+                    case 1:
+                        x = (int)p[1].X;
+                        y = (int)p[1].Y;
+                        //width = (int)(p[2].X - p[1].X);
+                        //height = (int)(p[0].Y - p[1].Y);
+                        width += height;
+                        height = width - height;
+                        width -= height;
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        break;
+                }
+                /*Console.WriteLine("====================================");
+                Console.WriteLine("p1=" + p[0]);
+                Console.WriteLine("p2=" + p[1]);
+                Console.WriteLine("p3=" + p[2]);
+                Console.WriteLine("p4=" + p[3]);
+                Console.WriteLine("w=" + width.ToString());
+                Console.WriteLine("h=" + height.ToString());*/
+                //sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.Y);
+                //ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.Y);
+            }
         }
 
         public class Join
@@ -172,7 +266,8 @@ namespace MainWindow
             public Join(string str)
             {
                 string[] tstr = str.Split(',');
-                p = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                //p = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                p = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat));
             }
             public Join(Join join)
             {
@@ -180,7 +275,34 @@ namespace MainWindow
             }
             public void tPaint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
             {
-                gr.DrawRectangle(new Pen(Color.Red), p.X - 1.0F, p.Y - 1.0F, 2.0F, 2.0F);
+                //gr.DrawRectangle(new Pen(Color.Red), p.X - 1.0F, p.Y - 1.0F, 2.0F, 2.0F);
+                gr.DrawRectangle(new Pen(Color.Red), p.X, p.Y, 2.0F, 2.0F);
+            }
+            public void pPaint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            {
+                gr.DrawRectangle(pen, p.X, p.Y, 1.0F, 1.0F);
+                //gr.DrawLine(pen, p, p);
+            }
+
+            public void Rotate(int param, PointF o)
+            {
+                float sin, cos;
+                switch (param)
+                {
+                    case 1:
+                        sin = 1.0F;
+                        cos = 0.0F;
+                        break;
+                    case 2:
+                        sin = 0.0F;
+                        cos = 1.0F;
+                        break;
+                    case 3:
+                    case 4:
+                    default:
+                        return;
+                }
+                p = new PointF(((p.X - o.X) * cos + (p.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(p.X - o.X) * sin + (p.Y - o.Y) * cos + o.X * sin + o.Y * cos);
             }
         }
 
@@ -189,7 +311,7 @@ namespace MainWindow
         //List<Arc> arcs;
         List<Line> lines;
         //List<Arrow> arrows;
-        //List<Text> strings;
+        List<Text> strings;
         List<Rectangle> rectangles;
         public List<Join> joins;
         Rectangle border;
@@ -197,6 +319,12 @@ namespace MainWindow
         public int Height { set; get; }
         public int Width { set; get; }
         private Region region;
+        private PointF pointRotate;
+        public Point TopLeft
+        {
+            private set;
+            get;
+        }
 
         public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
         {
@@ -208,7 +336,10 @@ namespace MainWindow
             foreach (Rectangle rect in rectangles)
                 rect.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
             //foreach (Join join in joins)
-            //    join.tPaint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                //join.tPaint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+
+            foreach(Text text in strings)
+                text.Paint(new Pen(Color.Red), gr, offsetX + border.width / 2, offsetY + border.height / 2);
 
             //border.Paint(pen, gr, offsetX - border.width / 2, offsetY - border.height / 2);
         }
@@ -254,7 +385,14 @@ namespace MainWindow
 
                 i++;
 
-                i++;
+                //Add strings
+                strings = new List<Text>();
+                tstr = str[i++].Split(';');
+                for (int ti = 0; ti < tstr.Length; ti++)
+                {
+                    Text text = new Text(tstr[ti]);
+                    strings.Add(text);
+                }
 
                 rectangles = new List<Rectangle>();
                 tstr = str[i++].Split(';'); //for rectangle
@@ -266,14 +404,25 @@ namespace MainWindow
                     rectangles.Add(rect);
                 }
 
+                TopLeft = new Point(int.MaxValue, int.MaxValue);
+
                 joins = new List<Join>();
                 tstr = str[i++].Split(';'); //for rectangle
                 for (int ti = 0; ti < tstr.Length; ti++)
-                    joins.Add(new Join(tstr[ti]));
+                {
+                    Join temp = new Join(tstr[ti]);
+                    if (temp.p.X + 1 < TopLeft.X)
+                        TopLeft = new Point((int)temp.p.X + 1, TopLeft.Y);
+                    if (temp.p.Y + 1 < TopLeft.Y)
+                        TopLeft = new Point(TopLeft.X, (int)temp.p.Y + 1);
+                    joins.Add(temp);
+                }
 
                 border = new Rectangle(0, 0, maxX - minX, maxY);
                 Height = maxY + 2;
-                Width = maxX + 1;
+                Width = maxX + 3;
+
+                pointRotate = new PointF(maxX, maxY);
 
                 isLoad = true;
             }
@@ -303,6 +452,51 @@ namespace MainWindow
         public static float maxFloat(float x1, float x2)
         {
             return (x1 > x2) ? x1 : x2;
+        }
+
+        /**
+         * 1 - по часовой
+         * 2 - против
+         * 3 - отражение по горизонтали
+         * 4 - отражение по вертикали
+         **/
+        public void Rotate(int param)
+        {
+            ////arcs
+
+            foreach (Line line in lines)
+                line.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
+
+            ////arrows
+
+            /*foreach (Text text in strings)
+                strings.Add(new Text(text));*/
+
+            
+            foreach (Rectangle rect in rectangles)
+                rect.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
+
+            TopLeft = new Point(int.MaxValue, int.MaxValue);
+
+            foreach (Join join in joins)
+            {
+                join.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
+                if (join.p.X + 1 < TopLeft.X)
+                    TopLeft = new Point((int)join.p.X + 1, TopLeft.Y);
+                if (join.p.Y + 1 < TopLeft.Y)
+                    TopLeft = new Point(TopLeft.X, (int)join.p.Y + 1);
+            }
+
+            /*border = new Rectangle(img.border);
+
+            isLoad = img.isLoad;
+            Height = img.Height;
+            Width = img.Width;
+
+            RefreshRegion();*/
+            Height = (int)pointRotate.X + 2;
+            Width = (int)pointRotate.Y + 3;
+            pointRotate = new PointF(pointRotate.Y, pointRotate.X);
         }
     }
 }
