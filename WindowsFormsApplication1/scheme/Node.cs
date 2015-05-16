@@ -41,7 +41,16 @@ namespace MainWindow.scheme
 
         public void EventMouseDown(object sender, MouseEventArgs e)
         {
-            ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, e.X + Location.X, e.Y + Location.Y, e.Delta));
+            Point tloc = ((SchemePicture)Parent).PointToMask(new Point(e.X + Location.X, e.Y + Location.Y));
+            Point loc;
+            if (tloc.X - 2 == Location.X && tloc.Y - 2 == Location.Y)
+                loc = tloc;
+            else if (Math.Abs((2 + Location.Y - tloc.X)) < Math.Abs(2 + Location.Y - tloc.Y))
+                loc = new Point(2 + Location.X, tloc.Y);
+            else
+                loc = new Point(tloc.X, 2 + Location.Y);
+            //((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, e.X + Location.X, e.Y + Location.Y, e.Delta));
+            ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, loc.X, loc.Y, e.Delta));
         }
 
         public void EventMouseLeave(object sender, EventArgs e)

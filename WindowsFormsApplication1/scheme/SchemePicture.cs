@@ -88,6 +88,11 @@ namespace MainWindow
             //Cursor.Hide();
         }
 
+        public Point PointToMask(Point p)
+        {
+            return new Point((int)(p.X / maskSize) * maskSize, (int)(p.Y / maskSize) * maskSize);
+        }
+
         public void EventMouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -152,7 +157,10 @@ namespace MainWindow
                     case 2:
                         //create wire
                         //MessageBox.Show("Провод!!!" + e.X.ToString() + "|" + e.Y.ToString());
-                        twire = new Wire(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize), this);
+                        if (object.ReferenceEquals(sender.GetType(), typeof(ElemPictureBox)))
+                            twire = new Wire(e.Location, this);
+                        else
+                            twire = new Wire(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize), this);
                         Controls.Add(twire);
                         //twire.Parent = this;
                         twire.BringToFront();
@@ -163,7 +171,8 @@ namespace MainWindow
                         if (object.ReferenceEquals(sender.GetType(), typeof(ElemPictureBox)))
                         {
                             //end wire
-                            twire.addPoint(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize));
+                            //twire.addPoint(e.Location);
+                            twire.r2Point(e.Location);
                             twire.setDone();
                             cursorMode[0] = 0;
                             return;
@@ -172,7 +181,8 @@ namespace MainWindow
                         {
                             //replace point
                             //get last point
-                            Point p = twire.replacePoint(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize));
+                            //Point p = twire.replacePoint(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize));
+                            Point p = twire.r2Point(e.Location);
                             //split from last point
                             List<Wire> tlw = ((Wire)sender).split(p);
                             if (tlw == null)
@@ -199,8 +209,10 @@ namespace MainWindow
                         }
                         if (object.ReferenceEquals(sender.GetType(), typeof(Node)))
                         {
-                            Point p = twire.replacePoint(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize));
-                            if (!p.Equals(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize)))
+                            //Point p = twire.replacePoint(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize));
+                            Point p = twire.r2Point(e.Location);
+                            //if (!p.Equals(new Point((int)Math.Round((double)(e.X / maskSize)) * maskSize, (int)Math.Round((double)(e.Y / maskSize)) * maskSize)))
+                            if (!p.Equals(e.Location))
                                 return;
                             twire.setDone();
                             ((Node)sender).BringToFront();

@@ -78,6 +78,52 @@ namespace MainWindow.scheme
             repaint();
         }
 
+        public Point r2Point(Point point)
+        {
+            if (point.X == pl[pl.Count - 2].X || point.Y == pl[pl.Count - 2].Y)
+                pl[pl.Count - 1] = new Point(point.X, point.Y);
+            else if (pl.Count == 2)
+            {
+                if (Math.Abs((point.X - pl[pl.Count - 2].X)) > Math.Abs(point.Y - pl[pl.Count - 2].Y))
+                {
+                    //pl[pl.Count - 2] = new Point(point.X, pl[pl.Count - 2].Y);
+                    pl[pl.Count - 1] = new Point(point.X, pl[pl.Count - 2].Y);
+                }
+                else
+                {
+                    //pl[pl.Count - 2] = new Point(pl[pl.Count - 2].X, point.Y);
+                    pl[pl.Count - 1] = new Point(pl[pl.Count - 2].X, point.Y);
+                }
+            }
+            /*else if (((SchemePicture)Parent).PointToMask(pl[pl.Count - 2]) != pl[pl.Count - 2])
+            {
+                Point p = ((SchemePicture)Parent).PointToMask(pl[pl.Count - 2]);
+                if (Math.Abs((p.X - pl[pl.Count - 2].X)) < Math.Abs(p.Y - pl[pl.Count - 2].Y))
+                {
+                    //pl[pl.Count - 2] = new Point(point.X, pl[pl.Count - 2].Y);
+                    pl[pl.Count - 1] = new Point(point.X, pl[pl.Count - 2].Y);
+                }
+                else
+                {
+                    //pl[pl.Count - 2] = new Point(pl[pl.Count - 2].X, point.Y);
+                    pl[pl.Count - 1] = new Point(pl[pl.Count - 2].X, point.Y);
+                }
+            }*/
+            else if (Math.Abs((point.X - pl[pl.Count - 2].X)) < Math.Abs(point.Y - pl[pl.Count - 2].Y))
+            {
+                pl[pl.Count - 2] = new Point(point.X, pl[pl.Count - 2].Y);
+                pl[pl.Count - 1] = new Point(point.X, point.Y);
+            }
+            else
+            {
+                pl[pl.Count - 2] = new Point(pl[pl.Count - 2].X, point.Y);
+                pl[pl.Count - 1] = new Point(point.X, point.Y);
+            }
+            updateRegion();
+            repaint();
+            return pl[pl.Count - 1];
+        }
+
         public Point replacePoint(Point point)
         {
             //pl[pl.Count - 1] = new Point(point.X - Location.X, point.Y - Location.Y);
@@ -197,11 +243,30 @@ namespace MainWindow.scheme
         }
         public void EventMouseDown(object sender, MouseEventArgs e)
         {
-            MessageBox.Show("down");
+            //MessageBox.Show("down");
             if (!isDone)
                 ((SchemePicture)Parent).EventMouseDown(sender, e);
             else
-                ((SchemePicture)Parent).EventMouseDown(sender, e);
+            {
+                Point tloc = ((SchemePicture)Parent).PointToMask(e.Location);
+                Point loc = new Point();
+                for (int i = 1; i < pl.Count; i++)
+                {
+                    if ((pl[i - 1].X == pl[i].X && pl[i].X == tloc.X) || (pl[i - 1].Y == pl[i].Y && pl[i].Y == tloc.Y))
+                    {
+                        loc = tloc;
+                        break;
+                    }
+                }
+                if (loc != tloc)
+                {
+                    if (Math.Abs((e.X - tloc.X)) > Math.Abs(e.Y - tloc.Y))
+                        loc = new Point(e.X, tloc.Y);
+                    else
+                        loc = new Point(tloc.X, e.Y);
+                }
+                ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, loc.X, loc.Y, e.Delta));
+            }
         }
 
         public void EventMouseClick(object sender, MouseEventArgs e)

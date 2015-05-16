@@ -20,8 +20,10 @@ namespace MainWindow
             lines = new List<Line>();
             foreach (Line line in img.lines)
                 lines.Add(new Line(line));
-            
-            ////arrows
+
+            arrows = new List<Arrow>();
+            foreach (Arrow arrow in img.arrows)
+                arrows.Add(new Arrow(arrow));
             
             strings = new List<Text>();
             foreach (Text text in img.strings)
@@ -126,8 +128,99 @@ namespace MainWindow
             }
         }
 
-        private struct Arrow
+        private class Arrow
         {
+            public PointF sp, ep;
+            private PointF[] pa;
+            private float k;
+            public Arrow(string str)
+            {
+                string[] tstr = str.Split(',');
+                //sp = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                //ep = new PointF(float.Parse(tstr[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[3], CultureInfo.InvariantCulture.NumberFormat) + 1.0F);
+                sp = new PointF(float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat));
+                ep = new PointF(float.Parse(tstr[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(tstr[3], CultureInfo.InvariantCulture.NumberFormat));
+                float h = float.Parse(tstr[4], CultureInfo.InvariantCulture.NumberFormat);
+                PointF tv = new PointF(sp.X - ep.X, sp.Y - ep.Y);
+                float norm = (float)Math.Sqrt(tv.X * tv.X + tv.Y * tv.Y);
+                float cos = (float)Math.Cos(30.0F * Math.PI / 180);
+                float sin = (float)Math.Sin(30.0F * Math.PI / 180);
+                k = h / norm / cos;
+                tv = new PointF(tv.X * k, tv.Y * k);
+                PointF v1 = new PointF(tv.X * cos + tv.Y * sin, -tv.X * sin + tv.Y * cos);
+                PointF v2 = new PointF(tv.X * cos - tv.Y * sin, tv.X * sin + tv.Y * cos);
+                pa = new PointF[3];
+                pa[0] = ep;
+                pa[1] = new PointF(ep.X + v1.X, ep.Y + v1.Y);
+                pa[2] = new PointF(ep.X + v2.X, ep.Y + v2.Y);
+                /*x1 = Convert.ToInt32(tstr[0]);
+                y1 = Convert.ToInt32(tstr[1]);
+                x2 = Convert.ToInt32(tstr[2]);
+                y2 = Convert.ToInt32(tstr[3]);*/
+            }
+            public Arrow(Arrow arrow)
+            {
+                sp = new PointF(arrow.sp.X, arrow.sp.Y);
+                ep = new PointF(arrow.ep.X, arrow.ep.Y);
+                pa = new PointF[3];
+                pa[0] = ep;
+                pa[1] = new PointF(arrow.pa[1].X, arrow.pa[1].Y);
+                pa[2] = new PointF(arrow.pa[2].X, arrow.pa[2].Y);
+                k = arrow.k;
+                //h = arrow.h;
+                /*x1 = line.x1;
+                y1 = line.y1;
+                x2 = line.x2;
+                y2 = line.y2;*/
+            }
+            public PointF maxPoint()
+            {
+                return new PointF(maxFloat(sp.X, ep.X), maxFloat(sp.Y, ep.Y));
+            }
+            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            {
+                //gr.DrawLine(pen, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
+                gr.DrawLine(pen, sp.X + 1.0F, sp.Y + 1.0F, ep.X + 1.0F, ep.Y + 1.0F);
+                PointF[] tpa = new PointF[3];
+                for (int i = 0; i < 3; i++)
+                    tpa[i] = new PointF(pa[i].X + 1.0F, pa[i].Y + 1.0F);
+                gr.FillPolygon(new SolidBrush(pen.Color), tpa);
+            }
+            public void Rotate(int param, PointF o)
+            {
+                float sin, cos;
+                switch (param)
+                {
+                    case 1:
+                        sin = 1.0F;
+                        cos = 0.0F;
+                        break;
+                    case 2:
+                        sin = 0.0F;
+                        cos = 1.0F;
+                        break;
+                    case 3:
+                    case 4:
+                    default:
+                        return;
+                }
+                sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.X * sin + o.Y * cos);
+                ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.X * sin + o.Y * cos);
+
+                PointF tv = new PointF(sp.X - ep.X, sp.Y - ep.Y);
+                cos = (float)Math.Cos(30.0F * Math.PI / 180);
+                sin = (float)Math.Sin(30.0F * Math.PI / 180);
+                tv = new PointF(tv.X * k, tv.Y * k);
+                PointF v1 = new PointF(tv.X * cos + tv.Y * sin, -tv.X * sin + tv.Y * cos);
+                PointF v2 = new PointF(tv.X * cos - tv.Y * sin, tv.X * sin + tv.Y * cos);
+                pa = new PointF[3];
+                pa[0] = ep;
+                pa[1] = new PointF(ep.X + v1.X, ep.Y + v1.Y);
+                pa[2] = new PointF(ep.X + v2.X, ep.Y + v2.Y);
+                //pa[0] = ep;
+                //for(int i = 1; i < 3; i++)
+                //    pa[i] = new PointF(((pa[i].X - o.X) * cos + (pa[i].Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(pa[i].X - o.X) * sin + (pa[i].Y - o.Y) * cos + o.X * sin + o.Y * cos);
+            }
         }
 
         private class Text
@@ -310,7 +403,7 @@ namespace MainWindow
         string ffs;
         //List<Arc> arcs;
         List<Line> lines;
-        //List<Arrow> arrows;
+        List<Arrow> arrows;
         List<Text> strings;
         List<Rectangle> rectangles;
         public List<Join> joins;
@@ -333,6 +426,8 @@ namespace MainWindow
 
             foreach (Line line in lines)
                 line.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+            foreach (Arrow arrow in arrows)
+                arrow.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
             foreach (Rectangle rect in rectangles)
                 rect.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
             //foreach (Join join in joins)
@@ -382,8 +477,22 @@ namespace MainWindow
                     lines.Add(line);
                 }
 
-
-                i++;
+                arrows = new List<Arrow>();
+                tstr = str[i++].Split(';');
+                if(!tstr[0].Equals(""))
+                    for (int ti = 0; ti < tstr.Length; ti++)
+                    {
+                        Arrow arrow = new Arrow(tstr[ti]);
+                        maxX = (int)maxFloat(maxX, arrow.maxPoint().X);
+                        maxY = (int)maxFloat(maxY, arrow.maxPoint().Y);
+                        /*maxX = (maxX < line.x1) ? line.x1 : maxX;
+                        maxX = (maxX < line.x2) ? line.x2 : maxX;
+                        maxY = (maxY < line.y1) ? line.y1 : maxY;
+                        maxY = (maxY < line.y2) ? line.y2 : maxY;
+                        minX = (minX > line.x1) ? line.x1 : minX;
+                        minX = (minX > line.x2) ? line.x2 : minX;*/
+                        arrows.Add(arrow);
+                    }
 
                 //Add strings
                 strings = new List<Text>();
@@ -467,12 +576,12 @@ namespace MainWindow
             foreach (Line line in lines)
                 line.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
 
-            ////arrows
+            foreach (Arrow arrow in arrows)
+                arrow.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
 
             /*foreach (Text text in strings)
                 strings.Add(new Text(text));*/
 
-            
             foreach (Rectangle rect in rectangles)
                 rect.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
 
