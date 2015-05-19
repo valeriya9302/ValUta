@@ -13,9 +13,10 @@ namespace MainWindow.scheme
      **/
     class Wire : PictureBox
     {
-        private List<Point> pl;
+        public List<Point> pl { private set; get; }
         public bool isDone;
         private Color color;
+        public object sel, eel;
         public Wire(Point startPoint, object parent)
         {
             pl = new List<Point>();
@@ -50,13 +51,27 @@ namespace MainWindow.scheme
             setDone();
         }
 
-
         public void setDone()
         {
             isDone = true;
             MouseEnter += new EventHandler(EventMouseEnter);
             MouseLeave += new EventHandler(EventMouseLeave);
             MouseClick += new MouseEventHandler(EventMouseClick);
+            Disposed += new EventHandler(EventDisposed);
+        }
+
+        void EventDisposed(object sender, EventArgs e)
+        {
+            if (sel != null && object.ReferenceEquals(sel.GetType(), typeof(Node)))
+                ((Node)sel).BeginDispose();
+            if (eel != null && object.ReferenceEquals(eel.GetType(), typeof(Node)))
+                ((Node)eel).BeginDispose();
+            MouseEnter -= EventMouseEnter;
+            MouseLeave -= EventMouseLeave;
+            MouseClick -= EventMouseClick;
+            Disposed -= EventDisposed;
+            MouseMove -= EventMouseMove;
+            MouseDown -= EventMouseDown;
         }
 
         public void EventMouseEnter(object sender, EventArgs e)
@@ -232,7 +247,23 @@ namespace MainWindow.scheme
 
             list2g.Reverse();
             list.Add(new Wire(list1g, Parent));
+            if (sel != null)
+            {
+                if (object.ReferenceEquals(sel.GetType(), typeof(ElemPictureBox)))
+                    ((ElemPictureBox)sel).addWire(list[0]);
+                if (object.ReferenceEquals(sel.GetType(), typeof(Node)))
+                    ((Node)sel).addWire(list[0]);
+                list[0].sel = sel;
+            }
             list.Add(new Wire(list2g, Parent));
+            if (eel != null)
+            {
+                if (object.ReferenceEquals(eel.GetType(), typeof(ElemPictureBox)))
+                    ((ElemPictureBox)eel).addWire(list[1]);
+                if (object.ReferenceEquals(eel.GetType(), typeof(Node)))
+                    ((Node)eel).addWire(list[1]);
+                list[1].eel = eel;
+            }
             return list;
         }
 
@@ -246,7 +277,7 @@ namespace MainWindow.scheme
             //MessageBox.Show("down");
             if (!isDone)
                 ((SchemePicture)Parent).EventMouseDown(sender, e);
-            else
+            else if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 Point tloc = ((SchemePicture)Parent).PointToMask(e.Location);
                 Point loc = new Point();
@@ -266,6 +297,10 @@ namespace MainWindow.scheme
                         loc = new Point(tloc.X, e.Y);
                 }
                 ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, loc.X, loc.Y, e.Delta));
+            }
+            else
+            {
+                ((SchemePicture)Parent).EventMouseDown(sender, e);
             }
         }
 

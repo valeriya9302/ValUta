@@ -18,6 +18,7 @@ namespace MainWindow
             MouseEnter += new EventHandler(EventMouseEnter);
             //SizeChanged += new EventHandler(EventSizeChanged);
             MouseClick += new MouseEventHandler(EventMouseClick);
+            
             //Parent.KeyDown += new KeyEventHandler(EventKeyDown);
             
             MouseWheel += new MouseEventHandler(EventMouseWheel);
@@ -34,6 +35,74 @@ namespace MainWindow
             scale = 1;
             UpdateMask();
             //rePaint();
+            cms = new ContextMenuStrip();
+            wcms = new ContextMenuStrip();
+            tsmi = new ToolStripMenuItem[6];
+            for (int i = 0; i < 6; i++)
+            {
+                tsmi[i] = new ToolStripMenuItem();
+                tsmi[i].Name = "rot" + (i + 1).ToString();
+                tsmi[i].Size = new System.Drawing.Size(154, 22);
+            }
+            wtsmi = new ToolStripMenuItem();
+            wtsmi.Name = "del".ToString();
+            wtsmi.Size = new System.Drawing.Size(154, 22);
+            cms.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                tsmi[0],
+                tsmi[1],
+                tsmi[2],
+                tsmi[3],
+                tsmi[4],
+                tsmi[5]});
+            wcms.Items.AddRange(new ToolStripItem[] {
+                wtsmi});
+            cms.Name = "cms_elem";
+            wcms.Name = "cms_wire";
+            cms.Size = new System.Drawing.Size(155, 92);
+            wcms.Size = new System.Drawing.Size(155, 30);
+            tsmi[0].Text = "Повернуть по часовой";
+            tsmi[0].Click += new EventHandler(CmsEventClick0);
+            tsmi[1].Text = "Повернуть против часовой";
+            tsmi[1].Click += new EventHandler(CmsEventClick1);
+            tsmi[2].Text = "Отразить по горизонтали";
+            tsmi[2].Click += new EventHandler(CmsEventClick2);
+            tsmi[3].Text = "Отразить по вертикали";
+            tsmi[3].Click += new EventHandler(CmsEventClick3);
+            tsmi[4].Text = "Удалить";
+            tsmi[4].Click += new EventHandler(CmsEventClick4);
+            tsmi[5].Text = "Свойства";
+            tsmi[5].Click += new EventHandler(CmsEventClick5);
+            wtsmi.Click += new EventHandler(CmsEventClickDel);
+            wtsmi.Text = "Удалить";
+        }
+
+        void CmsEventClick0(object sender, EventArgs e)
+        {
+            cepb.Rotate(1);
+        }
+        void CmsEventClick1(object sender, EventArgs e)
+        {
+            cepb.Rotate(2);
+        }
+        void CmsEventClick2(object sender, EventArgs e)
+        {
+            cepb.Rotate(3);
+        }
+        void CmsEventClick3(object sender, EventArgs e)
+        {
+            cepb.Rotate(4);
+        }
+        void CmsEventClick4(object sender, EventArgs e)
+        {
+            cepb.Dispose();
+        }
+        void CmsEventClick5(object sender, EventArgs e)
+        {
+            cepb.ShowEditForm();
+        }
+        void CmsEventClickDel(object sender, EventArgs e)
+        {
+            cwire.Dispose();
         }
 
         //private Graphics gr;
@@ -51,15 +120,18 @@ namespace MainWindow
          **/
         public int maskSize { set; get; }
 
-        private ElemPictureBox epb;
+        private ElemPictureBox epb, cepb;
         private Elems timg;
         private List<ElemPictureBox> lepb;
-        private Wire twire;
+        private Wire twire, cwire;
         private List<Wire> lwpb;
         private NameDriver ndriver;
         private new Size DefaultSize;
         public bool pressedControl { set; get; }
         private float scale;
+        private ContextMenuStrip cms, wcms;
+        private ToolStripMenuItem[] tsmi;
+        private ToolStripMenuItem wtsmi;
         
 
         public void setCursor(int cursor)
@@ -83,6 +155,8 @@ namespace MainWindow
                 epb.Dispose();
                 epb = null;
             }
+            if (timg == null)
+                cursorMode[0] = 0;
             /*epb = new ElemPictureBox(img, this);
             Controls.Add(epb);*/
             //Cursor.Hide();
@@ -97,6 +171,18 @@ namespace MainWindow
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
+                if (object.ReferenceEquals(sender.GetType(), typeof(ElemPictureBox)) && ((ElemPictureBox)sender).isDone)
+                {
+                    cepb = (ElemPictureBox)sender;
+                    cms.Show(cepb, cepb.Width, cepb.Height);
+                    return;
+                }
+                if (object.ReferenceEquals(sender.GetType(), typeof(Wire)) && ((Wire)sender).isDone)
+                {
+                    cwire = (Wire)sender;
+                    wcms.Show(this, e.X, e.Y);
+                    return;
+                }
                 if (cursorMode[0] == 3)
                 {
                     if (twire.removeLast())
@@ -158,7 +244,11 @@ namespace MainWindow
                         //create wire
                         //MessageBox.Show("Провод!!!" + e.X.ToString() + "|" + e.Y.ToString());
                         if (object.ReferenceEquals(sender.GetType(), typeof(ElemPictureBox)))
+                        {
                             twire = new Wire(e.Location, this);
+                            ((ElemPictureBox)sender).addWire(twire);
+                            twire.sel = (ElemPictureBox)sender;
+                        }
                         else
                             twire = new Wire(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize), this);
                         Controls.Add(twire);
@@ -174,6 +264,8 @@ namespace MainWindow
                             //twire.addPoint(e.Location);
                             twire.r2Point(e.Location);
                             twire.setDone();
+                            ((ElemPictureBox)sender).addWire(twire);
+                            twire.eel = (ElemPictureBox)sender;
                             cursorMode[0] = 0;
                             return;
                         }
@@ -202,6 +294,12 @@ namespace MainWindow
                                 Controls.Add(wire);
                                 wire.BringToFront();
                             }
+                            tlw[0].eel = tnode;
+                            tnode.addWire(tlw[0]);
+                            tlw[1].sel = tnode;
+                            tnode.addWire(tlw[1]);
+                            twire.eel = tnode;
+                            tnode.addWire(twire);
                             tnode.BringToFront();
                             cursorMode[0] = 0;
                             Refresh();
@@ -216,6 +314,7 @@ namespace MainWindow
                                 return;
                             twire.setDone();
                             ((Node)sender).BringToFront();
+                            ((Node)sender).addWire(twire);
                             cursorMode[0] = 0;
                             Refresh();
                             return;

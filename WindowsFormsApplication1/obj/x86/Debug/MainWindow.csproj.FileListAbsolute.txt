@@ -30,3 +30,5 @@ C:\Users\Цифры\Documents\GitHub\ValUta\WindowsFormsApplication1\obj\x86\Deb
 C:\Users\Цифры\Documents\GitHub\ValUta\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
 C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.scheme.ElemPreview.resources
 C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.scheme.EditForm.resources
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.scheme.AddForm.resources
+C:\ValUta\WindowsFormsApplication1\obj\x86\Debug\MainWindow.csprojResolveAssemblyReference.cache

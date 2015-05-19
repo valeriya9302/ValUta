@@ -13,17 +13,36 @@ namespace MainWindow.scheme
      **/
     class ElemPictureBox : PictureBox
     {
-        private Elems elem;
+        public Elems elem { private set; get; }
         private Point oldPos;
         private Pen pen;
         private List<Text> text;
         private bool sendParent = false;
-        private bool isDone;
+        public bool isDone;
         public bool isMouseEnter;
         private new Size DefaultSize;
         private Point DefaultLocation;
         public float angle { get; set; }
         private Image.Join Paintjoin;
+        private List<Wire> wire;
+        private bool current;
+        public bool Current 
+        {
+            get
+            {
+                return current;
+            }
+            set
+            {
+                if (sendParent || !isDone)
+                    return;
+                current = value;
+                if (current)
+                    pen.Color = Color.MediumVioletRed;
+                else
+                    pen.Color = Color.Black;
+            }
+        }
 
         public ElemPictureBox(Elems el)
         {
@@ -34,6 +53,7 @@ namespace MainWindow.scheme
             DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
             angle = 0.0F;
             Size = DefaultSize;
+            wire = new List<Wire>();
         }
 
         public ElemPictureBox(Elems el, object parent)
@@ -61,6 +81,7 @@ namespace MainWindow.scheme
             sendParent = false;
             angle = 0.0F;
             text = new List<Text>();
+            wire = new List<Wire>();
             //name = elem.prefix;
             /*foreach (Image.Join join in elem.image.joins)
             {
@@ -81,7 +102,11 @@ namespace MainWindow.scheme
             MouseClick -= EventMouseClick;
             MouseEnter -= EventMouseEnter;
             MouseLeave -= EventMouseLeave;
+            foreach (Text t in text)
+                t.Dispose();
             text.Clear();
+            foreach (Wire w in wire)
+                w.Dispose();
         }
 
         public void setLocation(Point pos)
@@ -108,6 +133,7 @@ namespace MainWindow.scheme
             text.Add(new Text(Name));
             text[1].Parent = Parent;
             text[1].setLocation(text[0].Location);
+            
             /*text[0].setLocation(new Point(Location.X + Width / 2, Location.Y));
             //text.Add(new sheme.Text(null, Parent, new Point(text[0].Location.X + Width / 2, Location.Y)));
             //text = new Text(null, Parent, new Point(Location.X + Width / 2, Location.Y));
@@ -117,6 +143,11 @@ namespace MainWindow.scheme
         }
 
         void EventMouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ShowEditForm();
+        }
+
+        public void ShowEditForm()
         {
             EditForm ef = new EditForm(text[1].Str, text[1].Hidden);
             if (ef.ShowDialog(this) == DialogResult.OK)
@@ -195,7 +226,7 @@ namespace MainWindow.scheme
                 ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, Location.X + e.X, Location.Y + e.Y, e.Delta));
                 return;
             }
-            if (sendParent)
+            if (sendParent && e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 //MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, oldPos.X + Location.X, oldPos.Y + Location.Y, e.Delta);
                 if (Paintjoin == null)
@@ -207,6 +238,11 @@ namespace MainWindow.scheme
             }
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
                 oldPos = new Point(e.X, e.Y);
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, Location.X, Location.Y, e.Delta);
+                ((SchemePicture)Parent).EventMouseDown(sender, ne);
+            }
             //text[0].EventMouseDown(sender, e);
         }
 
@@ -256,6 +292,7 @@ namespace MainWindow.scheme
 
         public void EventMouseClick(object sender, MouseEventArgs e)
         {
+            Current = !Current;
             //MessageBox.Show("trololo");
             //Console.WriteLine(e.X);
             //set current
@@ -278,9 +315,10 @@ namespace MainWindow.scheme
                 //((SchemePicture)Parent).EventMouseLeave(sender, e);
                 return;
             }
-            pen.Color = Color.Black;
             Paintjoin = null;
             sendParent = false;
+            if (!Current)
+                pen.Color = Color.Black;
             OnPaint(null);
         }
 
@@ -289,6 +327,11 @@ namespace MainWindow.scheme
             //Update();
             Refresh();
             //OnPaint(null);
+        }
+
+        public void addWire(Wire w)
+        {
+            wire.Add(w);
         }
 
         /**
@@ -302,6 +345,7 @@ namespace MainWindow.scheme
             elem.Rotate(param);
             DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
             Size = DefaultSize;
+            Refresh();
         }
     }
 }

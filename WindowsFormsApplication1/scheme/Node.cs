@@ -11,6 +11,7 @@ namespace MainWindow.scheme
     class Node : PictureBox
     {
         private Color color;
+        private List<Wire> lw;
 
         public Node(Point location, object parent)
         {
@@ -23,6 +24,7 @@ namespace MainWindow.scheme
             MouseEnter += new EventHandler(EventMouseEnter);
             MouseLeave += new EventHandler(EventMouseLeave);
             repaint();
+            lw = new List<Wire>();
         }
 
         public void repaint()
@@ -63,6 +65,32 @@ namespace MainWindow.scheme
         {
             color = Color.MediumVioletRed;
             repaint();
+        }
+
+        public void addWire(Wire w)
+        {
+            lw.Add(w);
+        }
+
+        public void BeginDispose()
+        {
+            int numWire = 0;
+            List<Wire> tlw = new List<Wire>();
+            foreach (Wire w in lw)
+            {
+                if (!w.IsDisposed && !w.Disposing)
+                    tlw.Add(w);
+            }
+            if (tlw.Count == 2)
+            {
+                for (int i = tlw[1].pl.Count - 2; i >= 0; i--)
+                    tlw[0].addPoint(tlw[1].pl[i]);
+                tlw[0].eel = tlw[1].sel;
+                ((ElemPictureBox)tlw[0].eel).addWire(tlw[0]);
+                tlw[1].eel = null;
+                tlw[1].Dispose();
+                this.Dispose();
+            }
         }
     }
 }

@@ -161,7 +161,9 @@ namespace MainWindow.scheme
 
         public void reset()
         {
-            epb.Dispose();
+            if (epb != null && !epb.Disposing)
+                epb.Dispose();
+            Refresh();
         }
     }
 }

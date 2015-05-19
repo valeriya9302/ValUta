@@ -13,6 +13,8 @@ namespace MainWindow
     public partial class Form1 : Form
     {
         private elements db = new elements();
+        private CategPictureBox cpb;
+        //private List<
         //private Images _images = new Images();
 
         public Form1()
@@ -97,6 +99,8 @@ namespace MainWindow
             comboBox1.Items.Clear();
             //pictureBox1.CreateGraphics().Clear(Color.Black);
             comboBox1.SelectedIndex = -1;
+            elemPreview1.reset();
+            schemePicture1.SetImage(null);
             // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
             {
@@ -108,7 +112,21 @@ namespace MainWindow
                 if (node != null)
                 {
                     treeView1.SelectedNode = node;
-                    cms_el_gr.Show(treeView1, p);
+                    if (node.Nodes.Count == 0)
+                    {
+                        List<Elems> lst = db.getElements(node.FullPath.Split('/'));
+                        int timgid = lst[0].image_id;
+                        bool eql = true;
+                        foreach (Elems temp in lst)
+                        {
+                            eql = eql && temp.image_id == timgid;
+                            comboBox1.Items.Add(temp.toString());
+                        }
+                        добавитьВИзбранноеToolStripMenuItem.Enabled = eql;
+                        if (eql)
+                            cpb = new CategPictureBox(lst[0]);
+                        cms_el_gr.Show(treeView1, p); 
+                    }
                 }
                 return;
             }
@@ -176,6 +194,28 @@ namespace MainWindow
         private void tabPage1_Resize(object sender, EventArgs e)
         {
             //schemePicture1.MinimumSize = ((TabPage)sender).Size;
+        }
+
+        private void добавитьВИзбранноеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStrip2.Items.Add(cpb.getImage());
+            //toolStrip2.Items[toolStrip2.Items.Count - 1].Click += new EventHandler(toolStrip2_Click);
+            toolStrip2.Items[toolStrip2.Items.Count - 1].MouseDown += new MouseEventHandler(toolStrip2_MouseDown);
+        }
+
+        private void добавитьЭлементToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            AddForm af = new AddForm(db.getElements(treeView1.SelectedNode.FullPath.Split('/'))[0].image_id, db.getEtname(treeView1.SelectedNode.FullPath.Split('/')));
+            af.ShowDialog(this);
+        }
+
+        private void toolStrip2_MouseDown(object sender, MouseEventArgs e)
+        {
+        }
+
+        private void удалитьToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            
         }
     }
 }

@@ -50,6 +50,38 @@ namespace MainWindow
             }
         }
 
+        public static List<string> getColNames(string tname)
+        {
+            var response = new List<string>();
+            string querySring = "SELECT TOP 1 * FROM [" + tname + "]";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var comand = new SqlCommand(querySring, connection);
+                try
+                {
+                    connection.Open();
+                    var reader = comand.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        for (var i = 0; i < reader.FieldCount; i++)
+                        {
+                            //Console.Write(reader[i]+"\t");
+                            //response.Add(reader[i].ToString());
+                            response.Add(reader.GetName(i));
+                        }
+                        //Console.WriteLine();
+                    }
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message + querySring);
+                    //throw;
+                }
+                return response;
+            }
+        }
+
         public static int SendQueryInsert(string querySring)
         {
             using (var connection = new SqlConnection(_connectionString))

@@ -74,6 +74,15 @@
       <DependentUpon>basic_elementsDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="elements.cs" />
+    <Compile Include="scheme\AddForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="scheme\AddForm.Designer.cs">
+      <DependentUpon>AddForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="scheme\CategPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="scheme\EditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,6 +143,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="scheme\AddForm.resx">
+      <DependentUpon>AddForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="scheme\EditForm.resx">
       <DependentUpon>EditForm.cs</DependentUpon>
     </EmbeddedResource>
