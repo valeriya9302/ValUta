@@ -223,7 +223,8 @@ namespace MainWindow
                         return;
                     case 1:
                         epb.setName(ndriver.getFreeName(epb.getPrefix()));
-                        epb.setDone();
+                        if (!epb.setDone())
+                            return;
                         lepb.Add(epb);
                         epb = null;
                         cursorMode[1] = cursorMode[0];
@@ -389,7 +390,7 @@ namespace MainWindow
                 //Controls.Add(epb);
                 //Cursor.Hide();
             }
-            Focus();
+            //Focus();
             /*Console.WriteLine("qwe");
             if (cursorMode[0] == 1)
             {
@@ -446,7 +447,8 @@ namespace MainWindow
                 //if (object.ReferenceEquals(sender.GetType(), typeof(ElemPictureBox)))
                   //  epb.setLocation(new Point(e.X + ((ElemPictureBox)sender).Location.X, e.Y + ((ElemPictureBox)sender).Location.Y));
                 //else
-                epb.setLocation(new Point((int)(e.X / maskSize) * maskSize - timg.image.TopLeft.X, (int)(e.Y / maskSize) * maskSize - timg.image.TopLeft.Y));
+                //FIXME//epb.setLocation(new Point((int)(e.X / maskSize) * maskSize - timg.image.TopLeft.X, (int)(e.Y / maskSize) * maskSize - timg.image.TopLeft.Y));
+                epb.setLocation(new Point((int)(e.X / maskSize) * maskSize - epb.image.TopLeft.X, (int)(e.Y / maskSize) * maskSize - epb.image.TopLeft.Y));
                 //Refresh();
             }
             if (cursorMode[0] == 3)

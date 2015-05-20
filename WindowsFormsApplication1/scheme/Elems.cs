@@ -8,27 +8,30 @@ namespace MainWindow.scheme
 {
     public class Elems
     {
-        private int id;
+        public int id;
         public int eid { get; set; }
         public string name;
         public string prefix;
         private List<int> disp;
         private List<string> param;
+        public string TableName;
         public int image_id { get; set; }
+        public bool Model { set; get; }
         public int posX { get; set; }
         public int posY { get; set; }
-        public Image image;
+        //FIXME//public Image image;
 
         public Elems(int img_id)
         {
             disp = new List<int>();
             param = new List<string>();
             this.image_id = img_id;
-            image = new Image(image_id);
+            //FIXME//image = new Image(image_id);
         }
 
-        public Elems(List<string> str, int img_id = -1)
+        public Elems(List<string> str, string tableName, int img_id = -1)
         {
+            TableName = tableName;
             int i = 0;
             param = new List<string>();
             id = Convert.ToInt32(str[i++]);
@@ -51,19 +54,20 @@ namespace MainWindow.scheme
             List<List<string>> img = Query.SendQuerySelect("SELECT IMAGE_ID FROM [image_manager] WHERE (EID = " + eid + ")");
             if (img.Count != 0 && img[0].Count != 0)
                 image_id = Convert.ToInt32(img[0][0]);
-            image = new Image(image_id);
+            //FIXME//image = new Image(image_id);
             //image = new Image();
         }
 
         public Elems(Elems elem)
         {
+            TableName = elem.TableName;
             id = elem.id;
             eid = elem.eid;
             name = elem.name;
             prefix = elem.prefix;
             param = elem.param;
             image_id = elem.image_id;
-            image = new Image(elem.image);
+            //FIXME//image = new Image(elem.image);
             disp = new List<int>();
             foreach (int d in elem.disp)
                 disp.Add(d);
@@ -73,18 +77,6 @@ namespace MainWindow.scheme
         {
             //return id + " " + name + " " + prefix;
             return getTextParam();
-        }
-
-        public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
-        {
-            image.id = image_id;
-            //image.Paint(pen, gr, offsetX + posX, offsetY + posY);
-            image.Paint(pen, gr, offsetX, offsetY);
-        }
-
-        public void Rotate(int param)
-        {
-            image.Rotate(param);
         }
 
         public string getTextParam()

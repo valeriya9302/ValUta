@@ -13,9 +13,41 @@ namespace MainWindow
     public partial class Form1 : Form
     {
         private elements db = new elements();
-        private CategPictureBox cpb;
+        //private CategPictureBox cpb;
+        Favorites fav;
         //private List<
         //private Images _images = new Images();
+
+        private class Favorites
+        {
+            public List<ElemPictureBox> epb;
+            public List<ToolStripItem> tsi;
+            private Elems elem;
+            public int CurrentIndex { set; get; }
+            public Favorites()
+            {
+                epb = new List<ElemPictureBox>();
+                tsi = new List<ToolStripItem>();
+            }
+            public void SetPretendent(Elems el)
+            {
+                elem = el;
+                elem.Model = true;
+            }
+            public System.Drawing.Image AddPretendent()
+            {
+                epb.Add(new ElemPictureBox(elem));
+                return epb[epb.Count - 1].getImage();
+            }
+            public void Remove()
+            {
+                epb.RemoveAt(CurrentIndex);
+            }
+            public ElemPictureBox get()
+            {
+                return epb[CurrentIndex];
+            }
+        }
 
         public Form1()
         {
@@ -26,6 +58,7 @@ namespace MainWindow
             List<int> ind = new List<int>();
             ind.Add(0);
             loadDataElems(treeView1.Nodes, ind);
+            fav = new Favorites();
         }
 
         private void loadDataElems(TreeNodeCollection _treeView, List<int> _ind)
@@ -100,7 +133,7 @@ namespace MainWindow
             //pictureBox1.CreateGraphics().Clear(Color.Black);
             comboBox1.SelectedIndex = -1;
             elemPreview1.reset();
-            schemePicture1.SetImage(null);
+            schemePicture1.SetImage((Elems)null);
             // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
             {
@@ -124,7 +157,8 @@ namespace MainWindow
                         }
                         добавитьВИзбранноеToolStripMenuItem.Enabled = eql;
                         if (eql)
-                            cpb = new CategPictureBox(lst[0]);
+                            //cpb = new CategPictureBox(lst[0]);
+                            fav.SetPretendent(lst[0]); //претендент
                         cms_el_gr.Show(treeView1, p); 
                     }
                 }
@@ -186,7 +220,7 @@ namespace MainWindow
             //Повернуть по часовой
             if (comboBox1.SelectedIndex == -1)
                 return;
-            db._elems[comboBox1.SelectedIndex].image.RightRotate();
+            //FIXME//db._elems[comboBox1.SelectedIndex].image.RightRotate();
             //pictureBox1.CreateGraphics().Clear(Color.Black);
             //db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), pictureBox1.CreateGraphics(), pictureBox1.Width / 2, pictureBox1.Height / 2);
         }
@@ -198,7 +232,9 @@ namespace MainWindow
 
         private void добавитьВИзбранноеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStrip2.Items.Add(cpb.getImage());
+            //добавление претендента
+            toolStrip2.Items.Add(fav.AddPretendent());
+            //toolStrip2.Items.Add(cpb.getImage());
             //toolStrip2.Items[toolStrip2.Items.Count - 1].Click += new EventHandler(toolStrip2_Click);
             toolStrip2.Items[toolStrip2.Items.Count - 1].MouseDown += new MouseEventHandler(toolStrip2_MouseDown);
         }
@@ -211,11 +247,30 @@ namespace MainWindow
 
         private void toolStrip2_MouseDown(object sender, MouseEventArgs e)
         {
+            fav.CurrentIndex = toolStrip2.Items.IndexOf((ToolStripItem)sender);
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                if (((ToolStripItem)sender).BackColor == System.Drawing.SystemColors.Control)
+                {
+                    schemePicture1.SetImage(fav.get().elem);
+                    ((ToolStripItem)sender).BackColor = System.Drawing.SystemColors.ControlDark;
+                }
+                else
+                {
+                    ((ToolStripItem)sender).BackColor = System.Drawing.SystemColors.Control;
+                    schemePicture1.SetImage((Elems)null);
+                }
+            }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                contextMenuStrip1.Show(toolStrip2, e.Location);
+            }
         }
 
         private void удалитьToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            
+            toolStrip2.Items.RemoveAt(fav.CurrentIndex);
+            fav.Remove();
         }
     }
 }

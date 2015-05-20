@@ -58,6 +58,7 @@ namespace MainWindow.scheme
             toolStripButton2.Name = "toolStripButton2";
             toolStripButton2.Size = new System.Drawing.Size(21, 20);
             toolStripButton2.Text = "Повернуть против часовой";
+            toolStripButton2.Click += new EventHandler(toolStripButton2_Click);
             //this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton4_Click);
             // 
             // toolStripButton3
@@ -135,6 +136,15 @@ namespace MainWindow.scheme
             if (epb == null || epb.Disposing)
                 return;
             epb.Rotate(1);
+            epb.Location = new Point((this.Width - 32 - epb.Width) / 2, (this.Height - epb.Height) / 2);
+            Refresh();
+        }
+
+        void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            if (epb == null || epb.Disposing)
+                return;
+            epb.Rotate(2);
             epb.Location = new Point((this.Width - 32 - epb.Width) / 2, (this.Height - epb.Height) / 2);
             Refresh();
         }

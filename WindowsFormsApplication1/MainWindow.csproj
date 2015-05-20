@@ -80,9 +80,6 @@
     <Compile Include="scheme\AddForm.Designer.cs">
       <DependentUpon>AddForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="scheme\CategPictureBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="scheme\EditForm.cs">
       <SubType>Form</SubType>
     </Compile>

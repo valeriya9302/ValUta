@@ -14,6 +14,7 @@ namespace MainWindow.scheme
     class ElemPictureBox : PictureBox
     {
         public Elems elem { private set; get; }
+        public Image image;
         private Point oldPos;
         private Pen pen;
         private List<Text> text;
@@ -47,10 +48,12 @@ namespace MainWindow.scheme
         public ElemPictureBox(Elems el)
         {
             elem = el;
+            image = new MainWindow.Image(elem.image_id);
             //elem = new Elems(el);
             BackColor = Color.DeepPink;
             pen = new Pen(Color.Black);
-            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            DefaultSize = new Size(image.Width, image.Height + 2);
             angle = 0.0F;
             Size = DefaultSize;
             wire = new List<Wire>();
@@ -59,6 +62,7 @@ namespace MainWindow.scheme
         public ElemPictureBox(Elems el, object parent)
         {
             elem = el;
+            image = new MainWindow.Image(elem.image_id);
             //elem = new Elems(el);
             Parent = (Control)parent;
             MouseDown += new MouseEventHandler(EventMouseDown);
@@ -75,7 +79,8 @@ namespace MainWindow.scheme
             pen = new Pen(Color.Black);
             //Height = elem.image.Height + 2;
             //Width = elem.image.Width;
-            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            DefaultSize = new Size(image.Width, image.Height + 2);
             Size = DefaultSize;
             isDone = false;
             sendParent = false;
@@ -118,8 +123,42 @@ namespace MainWindow.scheme
             Refresh();
         }
 
-        public void setDone()
+        public bool setDone()
         {
+            if (elem.Model)
+            {
+                text.Add(new Text(elem.getTextParam()));
+                //text[0].Parent = Parent;
+                //text[0].setLocation(Location);
+                text.Add(new Text(Name));
+                //text[1].Parent = Parent;
+                //text[1].setLocation(text[0].Location);
+
+                EditForm ef = new EditForm(text[1].Str, !text[1].Visible, elem, !text[0].Visible);
+                if (ef.ShowDialog(this) == DialogResult.OK)
+                {
+                    isDone = true;
+                    elem = new Elems(elem);
+                    MouseClick += new MouseEventHandler(EventMouseClick);
+                    MouseDoubleClick += new MouseEventHandler(EventMouseDoubleClick);
+                    MouseEnter += new EventHandler(EventMouseEnter);
+                    MouseLeave += new EventHandler(EventMouseLeave);
+
+                    text[1].Str = ef.name;
+                    text[1].Visible = !ef.HiddenName;
+
+                    elem = ef.el;
+                    text[0].Str = elem.getTextParam();
+                    text[0].Visible = !ef.HiddenEl;
+                    
+                    text[0].Parent = Parent;
+                    text[0].setLocation(Location);
+                    text[1].Parent = Parent;
+                    text[1].setLocation(text[0].Location);
+                    return true;
+                }
+                return false;
+            }
             isDone = true;
             elem = new Elems(elem);
             MouseClick += new MouseEventHandler(EventMouseClick);
@@ -133,6 +172,8 @@ namespace MainWindow.scheme
             text.Add(new Text(Name));
             text[1].Parent = Parent;
             text[1].setLocation(text[0].Location);
+
+            return true;
             
             /*text[0].setLocation(new Point(Location.X + Width / 2, Location.Y));
             //text.Add(new sheme.Text(null, Parent, new Point(text[0].Location.X + Width / 2, Location.Y)));
@@ -149,11 +190,15 @@ namespace MainWindow.scheme
 
         public void ShowEditForm()
         {
-            EditForm ef = new EditForm(text[1].Str, text[1].Hidden);
+            EditForm ef = new EditForm(text[1].Str, !text[1].Visible, elem, !text[0].Visible);
             if (ef.ShowDialog(this) == DialogResult.OK)
             {
                 text[1].Str = ef.name;
-                text[1].Hidden = ef.HiddenName;
+                text[1].Visible = !ef.HiddenName;
+
+                elem = ef.el;
+                text[0].Str = elem.getTextParam();
+                text[0].Visible = !ef.HiddenEl;
             }
         }
 
@@ -187,7 +232,8 @@ namespace MainWindow.scheme
 
         protected override void OnPaint(PaintEventArgs pe)
         {
-            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            DefaultSize = new Size(image.Width, image.Height + 2);
             Size = DefaultSize;
             //newReg - Задать регион объекта
             // Сначала требуется продумать рисование фигуры
@@ -202,7 +248,8 @@ namespace MainWindow.scheme
                 //pe.Graphics.EndContainer(pe.Graphics.BeginContainer(new RectangleF(0, 0, 1.4F, 1.4F), new RectangleF(), GraphicsUnit.Pixel));
                 pe.Graphics.ScaleTransform((float)Width / (float)DefaultSize.Width, (float)Height / (float)DefaultSize.Height);
                 //pe.Graphics.RotateTransform(angle);
-                elem.Paint(pen, pe.Graphics);
+                //FIXME//elem.Paint(pen, pe.Graphics);
+                image.Paint(pen, pe.Graphics);
                 if (Paintjoin != null)
                     Paintjoin.tPaint(pen, pe.Graphics);
                 //pe.Graphics.PageScale = Width / DefaultSize.Width;
@@ -212,10 +259,23 @@ namespace MainWindow.scheme
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
             gfx.Clear(Color.Azure);
-            elem.Paint(pen, gfx);
+            //FIXME//elem.Paint(pen, gfx);
+            image.Paint(pen, gfx);
             //gfx.ScaleTransform(Width / DefaultSize.Width, Height / DefaultSize.Height);
             //this.BackgroundImage = flag;
             //BringToFront();
+        }
+
+        public System.Drawing.Image getImage()
+        {
+            //FIXME//DefaultSize = new Size(baseElem.image.Width, baseElem.image.Height + 2);
+            Size = DefaultSize;
+            Bitmap flag = new Bitmap(Width, Height);
+            this.Image = flag;
+            Graphics gfx = Graphics.FromImage(this.Image);
+            gfx.Clear(Color.Azure);
+            image.Paint(pen, gfx);
+            return Image;
         }
 
         public void EventMouseDown(object sender, MouseEventArgs e)
@@ -259,8 +319,10 @@ namespace MainWindow.scheme
             {
                 Point oldLocation = Location;
                 setLocation(new Point(
-                    (int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.X,
-                    (int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.Y));
+                    //FIXME//(int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.X,
+                    //FIXME//(int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.Y));
+                    (int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - image.TopLeft.X,
+                    (int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - image.TopLeft.Y));
                 //text[0].EventMouseMove(sender, e);
                 text[0].offsetLocation(new Point(Location.X - oldLocation.X, Location.Y - oldLocation.Y));
                 text[1].offsetLocation(new Point(Location.X - oldLocation.X, Location.Y - oldLocation.Y));
@@ -275,7 +337,8 @@ namespace MainWindow.scheme
                 /*foreach (Image.Join join in elem.image.joins)
                     if (Math.Abs(join.x - e.X) < 3 && Math.Abs(join.y - e.Y) < 3)
                         MessageBox.Show("321");*/
-                foreach (Image.Join join in elem.image.joins)
+                //FIXME//foreach (Image.Join join in elem.image.joins)
+                foreach (Image.Join join in image.joins)
                 {
                     if (Math.Abs(join.p.X + 1.0F - e.X) < 4.0F && Math.Abs(join.p.Y + 1.0F - e.Y) < 4.0F)
                     {
@@ -342,8 +405,9 @@ namespace MainWindow.scheme
          **/
         public void Rotate(int param)
         {
-            elem.Rotate(param);
-            DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            image.Rotate(param);
+            //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            DefaultSize = new Size(image.Width, image.Height + 2);
             Size = DefaultSize;
             Refresh();
         }

@@ -10,7 +10,7 @@ namespace MainWindow.scheme
     class Text : PictureBox
     {
         private string str;
-        public bool Hidden { set; get; }
+        private int theight;
         public string Str
         {
             set
@@ -77,8 +77,7 @@ namespace MainWindow.scheme
             //Height = (int)size.Height;
             //Width = (int)size.Width;
             //Location = new Point(Location.X - (int)(size.Width / 2), Location.Y - (int)size.Height - 16);
-            if (!Hidden)
-                gfx.DrawString(str, new Font("Arial", 7), new SolidBrush(color), new PointF(0, 0));
+            gfx.DrawString(str, new Font("Arial", 7), new SolidBrush(color), new PointF(0, 0));
             //BringToFront();
         }
 

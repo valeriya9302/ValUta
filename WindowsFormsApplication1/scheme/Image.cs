@@ -111,12 +111,12 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
-                        sin = 1.0F;
+                        sin = -1.0F;
                         cos = 0.0F;
                         break;
                     case 2:
-                        sin = 0.0F;
-                        cos = 1.0F;
+                        sin = 1.0F;
+                        cos = 0.0F;
                         break;
                     case 3:
                     case 4:
@@ -192,12 +192,12 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
-                        sin = 1.0F;
+                        sin = -1.0F;
                         cos = 0.0F;
                         break;
                     case 2:
-                        sin = 0.0F;
-                        cos = 1.0F;
+                        sin = 1.0F;
+                        cos = 0.0F;
                         break;
                     case 3:
                     case 4:
@@ -311,12 +311,12 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
-                        sin = 1.0F;
+                        sin = -1.0F;
                         cos = 0.0F;
                         break;
                     case 2:
-                        sin = 0.0F;
-                        cos = 1.0F;
+                        sin = 1.0F;
+                        cos = 0.0F;
                         break;
                     case 3:
                     case 4:
@@ -328,6 +328,7 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
+                    case 2:
                         x = (int)p[1].X;
                         y = (int)p[1].Y;
                         //width = (int)(p[2].X - p[1].X);
@@ -336,7 +337,6 @@ namespace MainWindow
                         height = width - height;
                         width -= height;
                         break;
-                    case 2:
                     case 3:
                     case 4:
                         break;
@@ -383,12 +383,12 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
-                        sin = 1.0F;
+                        sin = -1.0F;
                         cos = 0.0F;
                         break;
                     case 2:
-                        sin = 0.0F;
-                        cos = 1.0F;
+                        sin = 1.0F;
+                        cos = 0.0F;
                         break;
                     case 3:
                     case 4:

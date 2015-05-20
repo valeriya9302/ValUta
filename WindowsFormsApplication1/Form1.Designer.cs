@@ -42,8 +42,10 @@
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.elemPreview1 = new MainWindow.scheme.ElemPreview();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.schemePicture1 = new MainWindow.SchemePicture();
             this.cms_add_root = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.добавитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьЭлементToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,8 +86,6 @@
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.удалитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.elemPreview1 = new MainWindow.scheme.ElemPreview();
-            this.schemePicture1 = new MainWindow.SchemePicture();
             this.cms_el_gr.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -97,14 +97,14 @@
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.elemPreview1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).BeginInit();
             this.cms_add_root.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.elemPreview1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).BeginInit();
             this.SuspendLayout();
             // 
             // cms_el_gr
@@ -251,6 +251,18 @@
             this.textBox1.Size = new System.Drawing.Size(145, 20);
             this.textBox1.TabIndex = 1;
             // 
+            // elemPreview1
+            // 
+            this.elemPreview1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.elemPreview1.Location = new System.Drawing.Point(3, 3);
+            this.elemPreview1.MinimumSize = new System.Drawing.Size(131, 130);
+            this.elemPreview1.Name = "elemPreview1";
+            this.elemPreview1.Size = new System.Drawing.Size(197, 149);
+            this.elemPreview1.TabIndex = 1;
+            this.elemPreview1.Text = "elemPreview1";
+            // 
             // tabControl1
             // 
             this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -275,6 +287,19 @@
             this.tabPage1.Text = "Default";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Resize += new System.EventHandler(this.tabPage1_Resize);
+            // 
+            // schemePicture1
+            // 
+            this.schemePicture1.BackColor = System.Drawing.Color.DarkGray;
+            this.schemePicture1.Image = ((System.Drawing.Image)(resources.GetObject("schemePicture1.Image")));
+            this.schemePicture1.Location = new System.Drawing.Point(3, 3);
+            this.schemePicture1.Margin = new System.Windows.Forms.Padding(0);
+            this.schemePicture1.maskSize = 10;
+            this.schemePicture1.Name = "schemePicture1";
+            this.schemePicture1.pressedControl = false;
+            this.schemePicture1.Size = new System.Drawing.Size(1500, 1000);
+            this.schemePicture1.TabIndex = 0;
+            this.schemePicture1.TabStop = false;
             // 
             // cms_add_root
             // 
@@ -316,7 +341,7 @@
             this.toolStripButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(237, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(268, 25);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -396,6 +421,7 @@
             // 
             // справкаToolStripButton
             // 
+            this.справкаToolStripButton.BackColor = System.Drawing.SystemColors.Control;
             this.справкаToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.справкаToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("справкаToolStripButton.Image")));
             this.справкаToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -560,7 +586,6 @@
             // 
             // toolStrip2
             // 
-            this.toolStrip2.ContextMenuStrip = this.contextMenuStrip1;
             this.toolStrip2.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip2.Location = new System.Drawing.Point(237, 24);
             this.toolStrip2.Name = "toolStrip2";
@@ -572,39 +597,14 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.удалитьToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(119, 26);
             // 
             // удалитьToolStripMenuItem
             // 
             this.удалитьToolStripMenuItem.Name = "удалитьToolStripMenuItem";
-            this.удалитьToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.удалитьToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.удалитьToolStripMenuItem.Text = "Удалить";
             this.удалитьToolStripMenuItem.Click += new System.EventHandler(this.удалитьToolStripMenuItem_Click_1);
-            // 
-            // elemPreview1
-            // 
-            this.elemPreview1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.elemPreview1.Location = new System.Drawing.Point(3, 3);
-            this.elemPreview1.MinimumSize = new System.Drawing.Size(131, 130);
-            this.elemPreview1.Name = "elemPreview1";
-            this.elemPreview1.Size = new System.Drawing.Size(197, 149);
-            this.elemPreview1.TabIndex = 1;
-            this.elemPreview1.Text = "elemPreview1";
-            // 
-            // schemePicture1
-            // 
-            this.schemePicture1.BackColor = System.Drawing.Color.DarkGray;
-            this.schemePicture1.Image = ((System.Drawing.Image)(resources.GetObject("schemePicture1.Image")));
-            this.schemePicture1.Location = new System.Drawing.Point(3, 3);
-            this.schemePicture1.Margin = new System.Windows.Forms.Padding(0);
-            this.schemePicture1.maskSize = 10;
-            this.schemePicture1.Name = "schemePicture1";
-            this.schemePicture1.pressedControl = false;
-            this.schemePicture1.Size = new System.Drawing.Size(1500, 1000);
-            this.schemePicture1.TabIndex = 0;
-            this.schemePicture1.TabStop = false;
             // 
             // Form1
             // 
@@ -633,16 +633,16 @@
             this.splitContainer3.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.elemPreview1)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).EndInit();
             this.cms_add_root.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.contextMenuStrip1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.elemPreview1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.schemePicture1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

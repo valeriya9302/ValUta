@@ -120,11 +120,12 @@ namespace MainWindow
         public List<Elems> getElements(string[] patch)
         {
             _elems.Clear();
-            List<List<string>> fstr = Query.SendQuerySelect("SELECT * FROM [" + getEtname(patch) + "]");
+            string tname = getEtname(patch);
+            List<List<string>> fstr = Query.SendQuerySelect("SELECT * FROM [" + tname + "]");
             foreach(List<string> str in fstr)
             //for (int i = 0; i < str.Count; )
             {
-                Elems tValue = new Elems(str);
+                Elems tValue = new Elems(str, tname);
                 //FIXME
                 /*List<List<string>> img = Query.SendQuerySelect("SELECT IMAGE_ID FROM [image_manager] WHERE (EID = " + tValue.eid + ")");
                 if(img.Count != 0 && img[0].Count != 0)
