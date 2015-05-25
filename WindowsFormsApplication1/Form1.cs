@@ -133,7 +133,7 @@ namespace MainWindow
             //pictureBox1.CreateGraphics().Clear(Color.Black);
             comboBox1.SelectedIndex = -1;
             elemPreview1.reset();
-            schemePicture1.SetImage((Elems)null);
+            schemePicture1.SetImage((Elems)null, (Image)null);
             // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
             {
@@ -206,7 +206,7 @@ namespace MainWindow
             //Graphics gr = pictureBox1.CreateGraphics();
             //db._elems[comboBox1.SelectedIndex].Paint(new Pen(Color.White), gr, pictureBox1.Width / 2, pictureBox1.Height / 2);
             this.elemPreview1.setElement(db._elems[comboBox1.SelectedIndex]);
-            schemePicture1.SetImage(db._elems[comboBox1.SelectedIndex]);
+            schemePicture1.SetImage(db._elems[comboBox1.SelectedIndex], elemPreview1.epb.image);
             //MessageBox.Show("x="+pictureBox1.Width.ToString());
         }
 
@@ -233,7 +233,8 @@ namespace MainWindow
         private void добавитьВИзбранноеToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //добавление претендента
-            toolStrip2.Items.Add(fav.AddPretendent());
+            toolStrip2.Items.Add("text", fav.AddPretendent()).DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolStrip2.Items[toolStrip2.Items.Count - 1].ImageTransparentColor = Color.Azure;
             //toolStrip2.Items.Add(cpb.getImage());
             //toolStrip2.Items[toolStrip2.Items.Count - 1].Click += new EventHandler(toolStrip2_Click);
             toolStrip2.Items[toolStrip2.Items.Count - 1].MouseDown += new MouseEventHandler(toolStrip2_MouseDown);
@@ -252,13 +253,13 @@ namespace MainWindow
             {
                 if (((ToolStripItem)sender).BackColor == System.Drawing.SystemColors.Control)
                 {
-                    schemePicture1.SetImage(fav.get().elem);
+                    schemePicture1.SetImage(fav.get().elem, (Image)null);
                     ((ToolStripItem)sender).BackColor = System.Drawing.SystemColors.ControlDark;
                 }
                 else
                 {
                     ((ToolStripItem)sender).BackColor = System.Drawing.SystemColors.Control;
-                    schemePicture1.SetImage((Elems)null);
+                    schemePicture1.SetImage((Elems)null, (Image)null);
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)

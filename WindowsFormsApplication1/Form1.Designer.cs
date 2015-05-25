@@ -291,10 +291,9 @@
             // schemePicture1
             // 
             this.schemePicture1.BackColor = System.Drawing.Color.DarkGray;
-            this.schemePicture1.Image = ((System.Drawing.Image)(resources.GetObject("schemePicture1.Image")));
             this.schemePicture1.Location = new System.Drawing.Point(3, 3);
             this.schemePicture1.Margin = new System.Windows.Forms.Padding(0);
-            this.schemePicture1.maskSize = 10;
+            this.schemePicture1.maskSize = new System.Drawing.Point(15, 15);
             this.schemePicture1.Name = "schemePicture1";
             this.schemePicture1.pressedControl = false;
             this.schemePicture1.Size = new System.Drawing.Size(1500, 1000);
@@ -341,7 +340,7 @@
             this.toolStripButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(268, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(237, 25);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 

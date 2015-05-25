@@ -17,7 +17,7 @@ namespace MainWindow.scheme
         List<TextBox> ltb;
         List<CheckBox> lcb;
         string tableName;
-        int eid;
+        int eid, cbsi;
 
         public AddForm(int image_id, string tname)
         {
@@ -27,6 +27,7 @@ namespace MainWindow.scheme
             ll = new List<Label>();
             ltb = new List<TextBox>();
             lcb = new List<CheckBox>();
+            cbsi = -1;
             List<List<string>> fstr = Query.SendQuerySelect("SELECT id FROM [image]");
             foreach (List<string> str in fstr)
             {
@@ -34,7 +35,7 @@ namespace MainWindow.scheme
                 limg.Add(new ElemPictureBox(new Elems(img)));
                 comboBox1.Items.Add("Элемент " + img);
                 if (img == image_id)
-                    comboBox1.SelectedIndex = comboBox1.Items.Count - 1;
+                    cbsi = comboBox1.Items.Count - 1;
             }
             List<string> nstr = Query.getColNames(tname);
             int si = 5;
@@ -87,6 +88,8 @@ namespace MainWindow.scheme
                 cimg.Dispose();
             cimg = new ElemPictureBox(limg[comboBox1.SelectedIndex].elem);
             pictureBox1.Controls.Add(cimg);
+            cimg.Visible = true;
+            cimg.Refresh();
             cimg.Location = new Point((pictureBox1.Width - cimg.Width) / 2, (pictureBox1.Height - cimg.Height) / 2);
         }
 
@@ -133,6 +136,11 @@ namespace MainWindow.scheme
 
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
+        }
+
+        private void AddForm_Shown(object sender, EventArgs e)
+        {
+            comboBox1.SelectedIndex = cbsi;
         }
     }
 }

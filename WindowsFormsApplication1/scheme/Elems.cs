@@ -83,7 +83,8 @@ namespace MainWindow.scheme
         {
             string res = "";
             foreach (int d in disp)
-                res += " " + param[d];
+                if(d != -1)
+                    res += " " + param[d];
             return res;
         }
     }

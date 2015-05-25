@@ -17,7 +17,7 @@ namespace MainWindow.scheme
         private ToolStripButton toolStripButton2;
         private ToolStripButton toolStripButton3;
         private ToolStripButton toolStripButton4;
-        private ElemPictureBox epb;
+        public ElemPictureBox epb { private set; get; }
 
         public ElemPreview()
         {
@@ -69,6 +69,7 @@ namespace MainWindow.scheme
             toolStripButton3.Name = "toolStripButton3";
             toolStripButton3.Size = new System.Drawing.Size(21, 20);
             toolStripButton3.Text = "Отразить по горизонтали";
+            toolStripButton3.Click += new EventHandler(toolStripButton3_Click);
             // 
             // toolStripButton4
             // 
@@ -78,6 +79,7 @@ namespace MainWindow.scheme
             toolStripButton4.Name = "toolStripButton4";
             toolStripButton4.Size = new System.Drawing.Size(21, 20);
             toolStripButton4.Text = "Отразить по вертикали";
+            toolStripButton4.Click += new EventHandler(toolStripButton4_Click);
             // 
             // toolStrip
             // 
@@ -103,7 +105,7 @@ namespace MainWindow.scheme
             this.pictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox.BackColor = System.Drawing.SystemColors.ControlText;
+            this.pictureBox.BackColor = Color.Azure;
             this.pictureBox.Location = new System.Drawing.Point(32, 0);
             this.pictureBox.MinimumSize = new System.Drawing.Size(100, 100);
             this.pictureBox.Name = "pictureBox";
@@ -149,6 +151,24 @@ namespace MainWindow.scheme
             Refresh();
         }
 
+        void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            if (epb == null || epb.Disposing)
+                return;
+            epb.Rotate(3);
+            epb.Location = new Point((this.Width - 32 - epb.Width) / 2, (this.Height - epb.Height) / 2);
+            Refresh();
+        }
+
+        void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            if (epb == null || epb.Disposing)
+                return;
+            epb.Rotate(4);
+            epb.Location = new Point((this.Width - 32 - epb.Width) / 2, (this.Height - epb.Height) / 2);
+            Refresh();
+        }
+
         void ISupportInitialize.BeginInit()
         {
             //throw new NotImplementedException();
@@ -166,6 +186,7 @@ namespace MainWindow.scheme
             epb = new ElemPictureBox(el);
             pictureBox.Controls.Add(epb);
             //epb.setLocation(new Point((this.Width / 2 - epb.Width / 2) / 1, (this.Height - epb.Height) / 2));
+            epb.Refresh();
             epb.Location = new Point((this.Width - 32 - epb.Width) / 2, (this.Height - epb.Height) / 2);
         }
 

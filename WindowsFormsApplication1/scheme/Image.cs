@@ -15,7 +15,10 @@ namespace MainWindow
         {
             id = img.id;
             ffs = img.ffs;
-            ////arcs
+
+            arcs = new List<Arc>();
+            foreach (Arc arc in img.arcs)
+                arcs.Add(new Arc(arc));
             
             lines = new List<Line>();
             foreach (Line line in img.lines)
@@ -67,8 +70,95 @@ namespace MainWindow
             load();
         }
 
-        private struct Arc
+        private class Arc
         {
+            public float x, y, width, height;
+            public float startAngle, sweepAngle;
+            //public PointF pos, wh;
+            public RectangleF rect;
+            public Arc(string str)
+            {
+                if (str.Equals(""))
+                    return;
+                string[] tstr = str.Split(',');
+                x = float.Parse(tstr[0], CultureInfo.InvariantCulture.NumberFormat);
+                y = float.Parse(tstr[1], CultureInfo.InvariantCulture.NumberFormat);
+                width = float.Parse(tstr[2], CultureInfo.InvariantCulture.NumberFormat);
+                height = float.Parse(tstr[3], CultureInfo.InvariantCulture.NumberFormat);
+                startAngle = float.Parse(tstr[4], CultureInfo.InvariantCulture.NumberFormat);
+                sweepAngle = float.Parse(tstr[5], CultureInfo.InvariantCulture.NumberFormat);
+            }
+            public Arc(Arc arc)
+            {
+                x = arc.x;
+                y = arc.y;
+                width = arc.width;
+                height = arc.height;
+                startAngle = arc.startAngle;
+                sweepAngle = arc.sweepAngle;
+            }
+            public void Paint(Pen pen, Graphics gr, PointF ptm)
+            {
+                //gr.DrawRectangle(pen, x + 1, y + 1, width, height);
+                //gr.DrawArc(pen, x + 1, y + 1, width, height, startAngle, sweepAngle);
+                gr.DrawArc(pen, x * ptm.X + 1, y * ptm.Y + 1, width * ptm.X, height * ptm.Y, startAngle, sweepAngle);
+                //gr.DrawRectangle(
+            }
+            public void Rotate(int param, PointF o)
+            {
+                PointF[] p;
+                PointF bp;
+                p = new PointF[4];
+                p[0] = new PointF(x, y);
+                p[1] = new PointF(x + width, y);
+                p[2] = new PointF(x + width, y + height);
+                p[3] = new PointF(x, y + height);
+                float sin, cos;
+                switch (param)
+                {
+                    case 1:
+                        p[3] = new PointF(-p[3].Y + o.Y + o.Y, p[3].X);
+                        x = (int)p[3].X;
+                        y = (int)p[3].Y;
+
+                        width += height;
+                        height = width - height;
+                        width -= height;
+                        //angle
+                        return;
+                    case 2:
+                        p[1] = new PointF(p[1].Y, -p[1].X + o.X + o.X);
+                        x = (int)p[1].X;
+                        y = (int)p[1].Y;
+
+                        width += height;
+                        height = width - height;
+                        width -= height;
+                        //angle
+                        return;
+                    case 3:
+                        p[3] = new PointF(p[3].X, -p[3].Y + o.Y + o.Y);
+                        x = (int)p[3].X;
+                        y = (int)p[3].Y;
+                        return;
+                    case 4:
+                        p[1] = new PointF(-p[1].X + o.X + o.X, p[1].Y);
+                        x = (int)p[1].X;
+                        y = (int)p[1].Y;
+                        return;
+                    default:
+                        return;
+                }
+                /*Console.WriteLine("====================================");
+                Console.WriteLine("p1=" + p[0]);
+                Console.WriteLine("p2=" + p[1]);
+                Console.WriteLine("p3=" + p[2]);
+                Console.WriteLine("p4=" + p[3]);
+                Console.WriteLine("w=" + width.ToString());
+                Console.WriteLine("h=" + height.ToString());*/
+                //sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.Y);
+                //ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.Y);
+            }
         }
 
         private class Line
@@ -100,10 +190,11 @@ namespace MainWindow
             {
                 return new PointF(maxFloat(sp.X, ep.X), maxFloat(sp.Y, ep.Y));
             }
-            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void Paint(Pen pen, Graphics gr, PointF ptm)
             {
                 //gr.DrawLine(pen, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
-                gr.DrawLine(pen, sp.X + 1.0F, sp.Y + 1.0F, ep.X + 1.0F, ep.Y + 1.0F);
+                //gr.DrawLine(pen, sp.X + 1.0F, sp.Y + 1.0F, ep.X + 1.0F, ep.Y + 1.0F);
+                gr.DrawLine(pen, sp.X * ptm.X + 1, sp.Y * ptm.Y + 1, ep.X * ptm.X + 1, ep.Y * ptm.Y + 1);
             }
             public void Rotate(int param, PointF o)
             {
@@ -111,20 +202,24 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
-                        sin = -1.0F;
-                        cos = 0.0F;
-                        break;
+                        sp = new PointF(-sp.Y + o.Y + o.Y, sp.X);
+                        ep = new PointF(-ep.Y + o.Y + o.Y, ep.X);
+                        return;
                     case 2:
-                        sin = 1.0F;
-                        cos = 0.0F;
-                        break;
+                        sp = new PointF(sp.Y, -sp.X + o.X + o.X);
+                        ep = new PointF(ep.Y, -ep.X + o.X + o.X);
+                        return;
                     case 3:
+                        sp = new PointF(sp.X, -sp.Y + o.Y + o.Y);
+                        ep = new PointF(ep.X, -ep.Y + o.Y + o.Y);
+                        return;
                     case 4:
+                        sp = new PointF(-sp.X + o.X + o.X, sp.Y);
+                        ep = new PointF(-ep.X + o.X + o.X, ep.Y);
+                        return;
                     default:
                         return;
                 }
-                sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.X * sin + o.Y * cos);
-                ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.X * sin + o.Y * cos);
             }
         }
 
@@ -177,49 +272,55 @@ namespace MainWindow
             {
                 return new PointF(maxFloat(sp.X, ep.X), maxFloat(sp.Y, ep.Y));
             }
-            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void Paint(Pen pen, Graphics gr, PointF ptm)
             {
                 //gr.DrawLine(pen, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
-                gr.DrawLine(pen, sp.X + 1.0F, sp.Y + 1.0F, ep.X + 1.0F, ep.Y + 1.0F);
+                /*gr.DrawLine(pen, sp.X + 1.0F, sp.Y + 1.0F, ep.X + 1.0F, ep.Y + 1.0F);
                 PointF[] tpa = new PointF[3];
                 for (int i = 0; i < 3; i++)
                     tpa[i] = new PointF(pa[i].X + 1.0F, pa[i].Y + 1.0F);
+                gr.FillPolygon(new SolidBrush(pen.Color), tpa);*/
+                gr.DrawLine(pen, sp.X * ptm.X + 1, sp.Y * ptm.Y + 1, ep.X * ptm.X + 1, ep.Y * ptm.Y + 1);
+                PointF[] tpa = new PointF[3];
+                for (int i = 0; i < 3; i++)
+                    tpa[i] = new PointF(pa[i].X * ptm.X + 1, pa[i].Y * ptm.Y + 1);
                 gr.FillPolygon(new SolidBrush(pen.Color), tpa);
             }
             public void Rotate(int param, PointF o)
             {
-                float sin, cos;
                 switch (param)
                 {
                     case 1:
-                        sin = -1.0F;
-                        cos = 0.0F;
-                        break;
+                        sp = new PointF(-sp.Y + o.Y + o.Y, sp.X);
+                        ep = new PointF(-ep.Y + o.Y + o.Y, ep.X);
+                        pa[0] = ep;
+                        for (int i = 1; i < 3; i++)
+                            pa[i] = new PointF(-pa[i].Y + o.Y + o.Y, pa[i].X);
+                        return;
                     case 2:
-                        sin = 1.0F;
-                        cos = 0.0F;
-                        break;
+                        sp = new PointF(sp.Y, -sp.X + o.X + o.X);
+                        ep = new PointF(ep.Y, -ep.X + o.X + o.X);
+                        pa[0] = ep;
+                        for(int i = 1; i < 3; i++)
+                            pa[i] = new PointF(pa[i].Y - o.Y + o.Y, -pa[i].X + o.X + o.X);
+                        return;
                     case 3:
+                        sp = new PointF(sp.X , - sp.Y + o.Y + o.Y);
+                        ep = new PointF(ep.X , - ep.Y + o.Y + o.Y);
+                        pa[0] = ep;
+                        for (int i = 1; i < 3; i++)
+                            pa[i] = new PointF(pa[i].X, -pa[i].Y + o.Y + o.Y);
+                        return;
                     case 4:
+                        sp = new PointF(-sp.X + o.X + o.X, sp.Y);
+                        ep = new PointF(-ep.X + o.X + o.X, ep.Y);
+                        pa[0] = ep;
+                        for(int i = 1; i < 3; i++)
+                            pa[i] = new PointF(-pa[i].X + o.X + o.X, pa[i].Y);
+                        return;
                     default:
                         return;
                 }
-                sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.X * sin + o.Y * cos);
-                ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.X * sin + o.Y * cos);
-
-                PointF tv = new PointF(sp.X - ep.X, sp.Y - ep.Y);
-                cos = (float)Math.Cos(30.0F * Math.PI / 180);
-                sin = (float)Math.Sin(30.0F * Math.PI / 180);
-                tv = new PointF(tv.X * k, tv.Y * k);
-                PointF v1 = new PointF(tv.X * cos + tv.Y * sin, -tv.X * sin + tv.Y * cos);
-                PointF v2 = new PointF(tv.X * cos - tv.Y * sin, tv.X * sin + tv.Y * cos);
-                pa = new PointF[3];
-                pa[0] = ep;
-                pa[1] = new PointF(ep.X + v1.X, ep.Y + v1.Y);
-                pa[2] = new PointF(ep.X + v2.X, ep.Y + v2.Y);
-                //pa[0] = ep;
-                //for(int i = 1; i < 3; i++)
-                //    pa[i] = new PointF(((pa[i].X - o.X) * cos + (pa[i].Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(pa[i].X - o.X) * sin + (pa[i].Y - o.Y) * cos + o.X * sin + o.Y * cos);
             }
         }
 
@@ -240,9 +341,9 @@ namespace MainWindow
                 pos = new PointF(text.pos.X, text.pos.Y);
                 str = text.str;
             }
-            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void Paint(Pen pen, Graphics gr, PointF ptm)
             {
-                gr.DrawString(str, new Font("Arial", 5), new SolidBrush(pen.Color), pos);
+                gr.DrawString(str, new Font("Arial", 2 * ptm.Y), new SolidBrush(pen.Color), new PointF(pos.X * ptm.X, pos.Y * ptm.Y));
             }
         }
 
@@ -275,9 +376,10 @@ namespace MainWindow
                 width = rect.width;
                 height = rect.height;
             }
-            public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void Paint(Pen pen, Graphics gr, PointF ptm)
             {
-                gr.DrawRectangle(pen, x + 1, y + 1, width, height);
+                //FIXgr.DrawRectangle(pen, x + 1, y + 1, width, height);
+                gr.DrawRectangle(pen, x * ptm.X + 1, y * ptm.Y + 1, width * ptm.X, height * ptm.Y);
                 //gr.DrawRectangle(
             }
             public void rotate(int rot)
@@ -307,49 +409,41 @@ namespace MainWindow
                 p[1] = new PointF(x + width, y);
                 p[2] = new PointF(x + width, y + height);
                 p[3] = new PointF(x, y + height);
-                float sin, cos;
                 switch (param)
                 {
                     case 1:
-                        sin = -1.0F;
-                        cos = 0.0F;
-                        break;
-                    case 2:
-                        sin = 1.0F;
-                        cos = 0.0F;
-                        break;
-                    case 3:
-                    case 4:
-                    default:
-                        return;
-                }
-                for(int i = 0; i < 4; i++)
-                    p[i] = new PointF(((p[i].X - o.X) * cos + (p[i].Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(p[i].X - o.X) * sin + (p[i].Y - o.Y) * cos + o.X * sin + o.Y * cos);
-                switch (param)
-                {
-                    case 1:
-                    case 2:
-                        x = (int)p[1].X;
-                        y = (int)p[1].Y;
-                        //width = (int)(p[2].X - p[1].X);
-                        //height = (int)(p[0].Y - p[1].Y);
+                        p[3] = new PointF(-p[3].Y + o.Y + o.Y, p[3].X);
+                        x = (int)p[3].X;
+                        y = (int)p[3].Y;
+
                         width += height;
                         height = width - height;
                         width -= height;
-                        break;
+                        //angle
+                        return;
+                    case 2: 
+                        p[1] = new PointF(p[1].Y, -p[1].X + o.X + o.X);
+                        x = (int)p[1].X;
+                        y = (int)p[1].Y;
+
+                        width += height;
+                        height = width - height;
+                        width -= height;
+                        //angle
+                        return;
                     case 3:
+                        p[3] = new PointF(p[3].X, -p[3].Y + o.Y + o.Y);
+                        x = (int)p[3].X;
+                        y = (int)p[3].Y;
+                        return;
                     case 4:
-                        break;
+                        p[1] = new PointF(-p[1].X + o.X + o.X, p[1].Y);
+                        x = (int)p[1].X;
+                        y = (int)p[1].Y;
+                        return;
+                    default:
+                        return;
                 }
-                /*Console.WriteLine("====================================");
-                Console.WriteLine("p1=" + p[0]);
-                Console.WriteLine("p2=" + p[1]);
-                Console.WriteLine("p3=" + p[2]);
-                Console.WriteLine("p4=" + p[3]);
-                Console.WriteLine("w=" + width.ToString());
-                Console.WriteLine("h=" + height.ToString());*/
-                //sp = new PointF(((sp.X - o.X) * cos + (sp.Y - o.Y) * sin) + o.X, -(sp.X - o.X) * sin + (sp.Y - o.Y) * cos + o.Y);
-                //ep = new PointF(((ep.X - o.X) * cos + (ep.Y - o.Y) * sin) + o.X, -(ep.X - o.X) * sin + (ep.Y - o.Y) * cos + o.Y);
             }
         }
 
@@ -366,14 +460,16 @@ namespace MainWindow
             {
                 p = new PointF(join.p.X, join.p.Y);
             }
-            public void tPaint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void tPaint(Pen pen, Graphics gr, PointF ptm)
             {
                 //gr.DrawRectangle(new Pen(Color.Red), p.X - 1.0F, p.Y - 1.0F, 2.0F, 2.0F);
-                gr.DrawRectangle(new Pen(Color.Red), p.X, p.Y, 2.0F, 2.0F);
+                //gr.DrawRectangle(new Pen(Color.Red), p.X * ptm.X - 1.0F, p.Y * ptm.Y - 1.0F, 4.5F, 4.5F);
+                float r = (float)Math.Round(2.0F * ptm.X / 2.0F);
+                gr.DrawEllipse(new Pen(Color.Red, pen.Width), p.X * ptm.X - r + 1.0F, p.Y * ptm.Y - r + 1.0F, 2.0F * r, 2.0F * r);
             }
-            public void pPaint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+            public void pPaint(Pen pen, Graphics gr, PointF ptm)
             {
-                gr.DrawRectangle(pen, p.X, p.Y, 1.0F, 1.0F);
+                gr.DrawRectangle(pen, p.X * ptm.X, p.Y * ptm.Y, 1.0F * ptm.X, 1.0F * ptm.Y);
                 //gr.DrawLine(pen, p, p);
             }
 
@@ -383,25 +479,26 @@ namespace MainWindow
                 switch (param)
                 {
                     case 1:
-                        sin = -1.0F;
-                        cos = 0.0F;
-                        break;
+                        p = new PointF(-p.Y + o.Y + o.Y, p.X);
+                        return;
                     case 2:
-                        sin = 1.0F;
-                        cos = 0.0F;
-                        break;
+                        p = new PointF(p.Y, -p.X + o.X + o.X);
+                        return;
                     case 3:
+                        p = new PointF(p.X, -p.Y + o.Y + o.Y);
+                        return;
                     case 4:
+                        p = new PointF(-p.X + o.X + o.X, p.Y);
+                        return;
                     default:
                         return;
                 }
-                p = new PointF(((p.X - o.X) * cos + (p.Y - o.Y) * sin) + o.X * cos + o.Y * sin, -(p.X - o.X) * sin + (p.Y - o.Y) * cos + o.X * sin + o.Y * cos);
             }
         }
 
         public int id;
         string ffs;
-        //List<Arc> arcs;
+        List<Arc> arcs;
         List<Line> lines;
         List<Arrow> arrows;
         List<Text> strings;
@@ -419,32 +516,34 @@ namespace MainWindow
             get;
         }
 
-        public void Paint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+        public void Paint(Pen pen, Graphics gr, PointF ptm, int offsetX = 0, int offsetY = 0)
         {
             if (!isLoad)
                 load();
 
+            foreach (Arc arc in arcs)
+                arc.Paint(pen, gr, ptm);
             foreach (Line line in lines)
-                line.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                line.Paint(pen, gr, ptm);
             foreach (Arrow arrow in arrows)
-                arrow.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                arrow.Paint(pen, gr, ptm);
             foreach (Rectangle rect in rectangles)
-                rect.Paint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                rect.Paint(pen, gr, ptm);
             //foreach (Join join in joins)
-                //join.tPaint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                //join.tPaint(pen, gr, ptm);
 
             foreach(Text text in strings)
-                text.Paint(new Pen(Color.Red), gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                text.Paint(pen, gr, ptm);
 
             //border.Paint(pen, gr, offsetX - border.width / 2, offsetY - border.height / 2);
         }
-        public void jPaint(Pen pen, Graphics gr, int offsetX = 0, int offsetY = 0)
+        public void jPaint(Pen pen, Graphics gr, PointF ptm)
         {
             if (!isLoad)
                 load();
 
             foreach (Join join in joins)
-                join.tPaint(pen, gr, offsetX + border.width / 2, offsetY + border.height / 2);
+                join.tPaint(pen, gr, ptm);
         }
 
         public void load()
@@ -458,24 +557,33 @@ namespace MainWindow
                 id = Convert.ToInt32(str[i++]);
                 ffs = str[i++];
 
-                i++;
-                //arcs = new List<Arc>();
+                arcs = new List<Arc>();
+                tstr = str[i++].Split(';');
+                if (!tstr[0].Equals(""))
+                    for (int ti = 0; ti < tstr.Length; ti++)
+                    {
+                        Arc arc = new Arc(tstr[ti]);
+                        maxX = (maxX < arc.x + arc.width) ? (int)(arc.x + arc.width) : maxX;
+                        maxY = (maxY < arc.y + arc.height) ? (int)(arc.y + arc.height) : maxY;
+                        arcs.Add(arc);
+                    }
 
                 lines = new List<Line>();
                 tstr = str[i++].Split(';'); //for lines
-                for (int ti = 0; ti < tstr.Length; ti++)
-                {
-                    Line line = new Line(tstr[ti]);
-                    maxX = (int)maxFloat(maxX, line.maxPoint().X);
-                    maxY = (int)maxFloat(maxY, line.maxPoint().Y);
-                    /*maxX = (maxX < line.x1) ? line.x1 : maxX;
-                    maxX = (maxX < line.x2) ? line.x2 : maxX;
-                    maxY = (maxY < line.y1) ? line.y1 : maxY;
-                    maxY = (maxY < line.y2) ? line.y2 : maxY;
-                    minX = (minX > line.x1) ? line.x1 : minX;
-                    minX = (minX > line.x2) ? line.x2 : minX;*/
-                    lines.Add(line);
-                }
+                if (!tstr[0].Equals(""))
+                    for (int ti = 0; ti < tstr.Length; ti++)
+                    {
+                        Line line = new Line(tstr[ti]);
+                        maxX = (int)maxFloat(maxX, line.maxPoint().X);
+                        maxY = (int)maxFloat(maxY, line.maxPoint().Y);
+                        /*maxX = (maxX < line.x1) ? line.x1 : maxX;
+                        maxX = (maxX < line.x2) ? line.x2 : maxX;
+                        maxY = (maxY < line.y1) ? line.y1 : maxY;
+                        maxY = (maxY < line.y2) ? line.y2 : maxY;
+                        minX = (minX > line.x1) ? line.x1 : minX;
+                        minX = (minX > line.x2) ? line.x2 : minX;*/
+                        lines.Add(line);
+                    }
 
                 arrows = new List<Arrow>();
                 tstr = str[i++].Split(';');
@@ -528,29 +636,15 @@ namespace MainWindow
                 }
 
                 border = new Rectangle(0, 0, maxX - minX, maxY);
-                Height = maxY + 2;
-                Width = maxX + 3;
+                //Height = maxY + 2;
+                Height = maxY + 1;
+                //Width = maxX + 3;
+                Width = maxX + 1;
 
                 pointRotate = new PointF(maxX, maxY);
 
                 isLoad = true;
             }
-        }
-
-        public void LeftRotate()
-        {
-        }
-
-        public void RightRotate()
-        {
-            double angle = Math.PI * 90.0 / 180.0;
-            Console.WriteLine(angle);
-            /*foreach(Line line in lines)
-            {
-                line.rotate(angle);
-            }*/
-            foreach (Rectangle rect in rectangles)
-                rect.rotate(1);
         }
 
         public Region getRegion()
@@ -571,7 +665,8 @@ namespace MainWindow
          **/
         public void Rotate(int param)
         {
-            ////arcs
+            foreach (Arc arc in arcs)
+                arc.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
 
             foreach (Line line in lines)
                 line.Rotate(param, new PointF(pointRotate.X / 2.0F, pointRotate.Y / 2.0F));
@@ -603,9 +698,12 @@ namespace MainWindow
             Width = img.Width;
 
             RefreshRegion();*/
-            Height = (int)pointRotate.X + 2;
-            Width = (int)pointRotate.Y + 3;
-            pointRotate = new PointF(pointRotate.Y, pointRotate.X);
+            if (param == 1 || param == 2)
+            {
+                Height = (int)pointRotate.X + 1;
+                Width = (int)pointRotate.Y + 1;
+                pointRotate = new PointF(pointRotate.Y, pointRotate.X);
+            }
         }
     }
 }

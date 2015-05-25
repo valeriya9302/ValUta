@@ -68,7 +68,8 @@ namespace MainWindow.scheme
             // Сначала требуется продумать рисование фигуры
 
             //Region = new Region(elem.image.getRegion().GetRegionData());
-
+            if (Width == 0 || Height == 0)
+                return;
             Bitmap flag = new Bitmap(Width, Height);
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);

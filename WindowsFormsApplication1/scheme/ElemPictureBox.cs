@@ -11,7 +11,7 @@ namespace MainWindow.scheme
     /**
      * Класс для рисования одного элемента на схеме
      **/
-    class ElemPictureBox : PictureBox
+    public class ElemPictureBox : PictureBox
     {
         public Elems elem { private set; get; }
         public Image image;
@@ -21,28 +21,46 @@ namespace MainWindow.scheme
         private bool sendParent = false;
         public bool isDone;
         public bool isMouseEnter;
-        private new Size DefaultSize;
         private Point DefaultLocation;
-        public float angle { get; set; }
         private Image.Join Paintjoin;
+        public Point TopLeft { private set; get; }
         private List<Wire> wire;
-        private bool current;
-        public bool Current 
+        private PointF ptm;
+
+        public ElemPictureBox(Elems el, Image img, object parent)
         {
-            get
+            elem = el;
+            image = new MainWindow.Image(img);
+            //elem = new Elems(el);
+            Parent = (Control)parent;
+            MouseDown += new MouseEventHandler(EventMouseDown);
+            MouseMove += new MouseEventHandler(EventMouseMove);
+            //MouseMove += new MouseEventHandler(((SchemePicture)Parent).EventMouseMove);
+            //MouseClick += new MouseEventHandler(EventMouseClick);
+            //MouseEnter += new EventHandler(EventMouseEnter);
+            //MouseEnter += new EventHandler(((SchemePicture)Parent).EventMouseEnter);
+            //MouseLeave += new EventHandler(EventMouseLeave);
+            Disposed += new EventHandler(EventDisposed);
+            Resize += new EventHandler(EventResize);
+            //ResizeRedraw = true;
+            BackColor = Color.DeepPink;
+            pen = new Pen(Color.Black);
+            //Height = elem.image.Height + 2;
+            //Width = elem.image.Width;
+            //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
+            Size = new Size(image.Width, image.Height + 2);
+            isDone = false;
+            sendParent = false;
+            text = new List<Text>();
+            wire = new List<Wire>();
+            //name = elem.prefix;
+            /*foreach (Image.Join join in elem.image.joins)
             {
-                return current;
-            }
-            set
-            {
-                if (sendParent || !isDone)
-                    return;
-                current = value;
-                if (current)
-                    pen.Color = Color.MediumVioletRed;
-                else
-                    pen.Color = Color.Black;
-            }
+                Controls.Add(join);
+                join.Parent = this;
+                join.BackColor = Color.Red;
+                join.BringToFront();
+            }*/
         }
 
         public ElemPictureBox(Elems el)
@@ -53,9 +71,7 @@ namespace MainWindow.scheme
             BackColor = Color.DeepPink;
             pen = new Pen(Color.Black);
             //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
-            DefaultSize = new Size(image.Width, image.Height + 2);
-            angle = 0.0F;
-            Size = DefaultSize;
+            Size = new Size(image.Width, image.Height + 2);
             wire = new List<Wire>();
         }
 
@@ -80,11 +96,9 @@ namespace MainWindow.scheme
             //Height = elem.image.Height + 2;
             //Width = elem.image.Width;
             //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
-            DefaultSize = new Size(image.Width, image.Height + 2);
-            Size = DefaultSize;
+            Size = new Size(image.Width, image.Height + 2);
             isDone = false;
             sendParent = false;
-            angle = 0.0F;
             text = new List<Text>();
             wire = new List<Wire>();
             //name = elem.prefix;
@@ -104,7 +118,6 @@ namespace MainWindow.scheme
             MouseDown -= EventMouseDown;
             MouseMove -= EventMouseMove;
             Disposed -= EventDisposed;
-            MouseClick -= EventMouseClick;
             MouseEnter -= EventMouseEnter;
             MouseLeave -= EventMouseLeave;
             foreach (Text t in text)
@@ -119,7 +132,7 @@ namespace MainWindow.scheme
             Location = pos;
             DefaultLocation = Location;
             //Refresh();
-            OnPaint(null);
+            //OnPaint(null);
             Refresh();
         }
 
@@ -139,7 +152,6 @@ namespace MainWindow.scheme
                 {
                     isDone = true;
                     elem = new Elems(elem);
-                    MouseClick += new MouseEventHandler(EventMouseClick);
                     MouseDoubleClick += new MouseEventHandler(EventMouseDoubleClick);
                     MouseEnter += new EventHandler(EventMouseEnter);
                     MouseLeave += new EventHandler(EventMouseLeave);
@@ -161,7 +173,6 @@ namespace MainWindow.scheme
             }
             isDone = true;
             elem = new Elems(elem);
-            MouseClick += new MouseEventHandler(EventMouseClick);
             MouseDoubleClick += new MouseEventHandler(EventMouseDoubleClick);
             MouseEnter += new EventHandler(EventMouseEnter);
             MouseLeave += new EventHandler(EventMouseLeave);
@@ -207,23 +218,6 @@ namespace MainWindow.scheme
             return elem.prefix;
         }
 
-        public void setScale(int scale)
-        {
-            Bitmap flag = new Bitmap(Width, Height);
-            this.Image = flag;
-            Graphics gfx = Graphics.FromImage(this.Image);
-            gfx.ScaleTransform(scale, scale);
-            //repaint();
-            Update();
-        }
-
-        /*public new void Scale(float scale)
-        {
-            Width = (int)(DefaultSize.Width * scale);
-            Height = (int)(DefaultSize.Height * scale);
-            Location = new Point((int)(DefaultLocation.X / scale), (int)(DefaultLocation.Y / scale));
-        }*/
-
         public void setName(string name)
         {
             this.Name = name;
@@ -232,49 +226,42 @@ namespace MainWindow.scheme
 
         protected override void OnPaint(PaintEventArgs pe)
         {
-            //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
-            DefaultSize = new Size(image.Width, image.Height + 2);
-            Size = DefaultSize;
-            //newReg - Задать регион объекта
-            // Сначала требуется продумать рисование фигуры
-
-            //Region = new Region(elem.image.getRegion().GetRegionData());
-
-            //Bitmap flag = new Bitmap(DefaultSize.Width, DefaultSize.Height);
-            if (pe != null)
-            {
-                pe.Graphics.Clear(Color.Azure);
-                //pe.Graphics.BeginContainer(new RectangleF(), new RectangleF(), GraphicsUnit.Pixel);
-                //pe.Graphics.EndContainer(pe.Graphics.BeginContainer(new RectangleF(0, 0, 1.4F, 1.4F), new RectangleF(), GraphicsUnit.Pixel));
-                pe.Graphics.ScaleTransform((float)Width / (float)DefaultSize.Width, (float)Height / (float)DefaultSize.Height);
-                //pe.Graphics.RotateTransform(angle);
-                //FIXME//elem.Paint(pen, pe.Graphics);
-                image.Paint(pen, pe.Graphics);
-                if (Paintjoin != null)
-                    Paintjoin.tPaint(pen, pe.Graphics);
-                //pe.Graphics.PageScale = Width / DefaultSize.Width;
+            if (pe == null)
                 return;
+
+            if (SchemePicture.useGetPixelSizePerMM == 1)
+            {
+                SizeF tptm = SchemePicture.GetPixelSizePerMM();
+                ptm = new PointF(tptm.Width, tptm.Height);
             }
-            Bitmap flag = new Bitmap(Width, Height);
-            this.Image = flag;
-            Graphics gfx = Graphics.FromImage(this.Image);
-            gfx.Clear(Color.Azure);
-            //FIXME//elem.Paint(pen, gfx);
-            image.Paint(pen, gfx);
-            //gfx.ScaleTransform(Width / DefaultSize.Width, Height / DefaultSize.Height);
-            //this.BackgroundImage = flag;
-            //BringToFront();
+            else
+                ptm = new PointF(pe.Graphics.DpiX / 25.4F, pe.Graphics.DpiY / 25.4F);
+            ptm = new PointF((int)(ptm.X), (int)(ptm.Y));
+            //ptm = new PointF((int)(25.4F / pe.Graphics.DpiX), (int)(25.4F / pe.Graphics.DpiY));
+            TopLeft = new Point((int)((image.TopLeft.X-1) * ptm.X + 1), (int)((image.TopLeft.Y-1) * ptm.Y + 1));
+            Size = new Size((int)(image.Width * ptm.X), (int)((image.Height + 2) * ptm.Y));
+            
+            //pe.Graphics.PageUnit = GraphicsUnit.Millimeter;
+            //pe.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+            pe.Graphics.Clear(Color.Azure);
+            image.Paint(new Pen(pen.Color, (int)(Math.Round(ptm.X / 2.0F))), pe.Graphics, ptm);
+            if (Paintjoin != null)
+                Paintjoin.tPaint(pen, pe.Graphics, ptm);
+
+            return;
         }
 
         public System.Drawing.Image getImage()
         {
             //FIXME//DefaultSize = new Size(baseElem.image.Width, baseElem.image.Height + 2);
-            Size = DefaultSize;
+            //Size = DefaultSize;
             Bitmap flag = new Bitmap(Width, Height);
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
+            
             gfx.Clear(Color.Azure);
-            image.Paint(pen, gfx);
+            image.Paint(pen, gfx, new PointF(1.0F, 1.0F));
+            
             return Image;
         }
 
@@ -283,7 +270,7 @@ namespace MainWindow.scheme
             //MessageBox.Show("this");
             if (!isDone)
             {
-                ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, Location.X + e.X, Location.Y + e.Y, e.Delta));
+                ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, Location.X, Location.Y, e.Delta));
                 return;
             }
             if (sendParent && e.Button == System.Windows.Forms.MouseButtons.Left)
@@ -291,7 +278,7 @@ namespace MainWindow.scheme
                 //MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, oldPos.X + Location.X, oldPos.Y + Location.Y, e.Delta);
                 if (Paintjoin == null)
                     return;
-                MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, Location.X + (int)Paintjoin.p.X + 1, Location.Y + (int)Paintjoin.p.Y + 1, e.Delta);
+                MouseEventArgs ne = new MouseEventArgs(e.Button, e.Clicks, Location.X + (int)(Math.Round(Paintjoin.p.X * ptm.X) + 1), Location.Y + (int)(Math.Round(Paintjoin.p.Y * ptm.Y) + 1), e.Delta);
                 ((SchemePicture)Parent).setCursor(2);
                 ((SchemePicture)Parent).EventMouseDown(sender, ne);
                 return;
@@ -318,12 +305,14 @@ namespace MainWindow.scheme
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
                 Point oldLocation = Location;
-                setLocation(new Point(
+                Point tloc = ((SchemePicture)Parent).PointToMask(new Point(Location.X - oldPos.X + e.X, Location.Y - oldPos.Y + e.Y));
+                setLocation(new Point(tloc.X - TopLeft.X, tloc.Y - TopLeft.Y));
+                /*!!!setLocation(new Point(
                     //FIXME//(int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.X,
                     //FIXME//(int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - elem.image.TopLeft.Y));
                     (int)((Location.X - oldPos.X + e.X) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - image.TopLeft.X,
                     (int)((Location.Y - oldPos.Y + e.Y) / ((SchemePicture)(Parent)).maskSize) * ((SchemePicture)(Parent)).maskSize - image.TopLeft.Y));
-                //text[0].EventMouseMove(sender, e);
+                *///text[0].EventMouseMove(sender, e);
                 text[0].offsetLocation(new Point(Location.X - oldLocation.X, Location.Y - oldLocation.Y));
                 text[1].offsetLocation(new Point(Location.X - oldLocation.X, Location.Y - oldLocation.Y));
                 /*text[0].offsetLocation(new Point(
@@ -332,7 +321,7 @@ namespace MainWindow.scheme
                 Parent.Refresh();
                 return;
             }
-            else
+            //else
             {
                 /*foreach (Image.Join join in elem.image.joins)
                     if (Math.Abs(join.x - e.X) < 3 && Math.Abs(join.y - e.Y) < 3)
@@ -340,34 +329,27 @@ namespace MainWindow.scheme
                 //FIXME//foreach (Image.Join join in elem.image.joins)
                 foreach (Image.Join join in image.joins)
                 {
-                    if (Math.Abs(join.p.X + 1.0F - e.X) < 4.0F && Math.Abs(join.p.Y + 1.0F - e.Y) < 4.0F)
+                    //Graphics gfx = Graphics.FromImage(this.Image);
+                    if (Math.Abs((join.p.X + 1.0F) * ptm.X - e.X) < 4.0F && Math.Abs((join.p.Y + 1.0F) * ptm.Y - e.Y) < 4.0F)
                     {
-                        //MessageBox.Show(join.p.ToString() + this.Size.ToString());
-                        Graphics gfx = Graphics.FromImage(this.Image);
-                        join.tPaint(new Pen(Color.Red), gfx);
                         Paintjoin = join;
                         oldPos = new Point((int)join.p.X, (int)join.p.Y);
                         sendParent = true;
+                        Refresh();
                     }
                 }
             }
         }
 
-        public void EventMouseClick(object sender, MouseEventArgs e)
-        {
-            Current = !Current;
-            //MessageBox.Show("trololo");
-            //Console.WriteLine(e.X);
-            //set current
-        }
-
         public void EventMouseEnter(object sender, EventArgs e)
         {
             isMouseEnter = true;
+            BringToFront();
             if (!isDone)
                 return;
             pen.Color = Color.MediumVioletRed;
-            OnPaint(null);
+            //OnPaint(null);
+            Refresh();
         }
 
         public void EventMouseLeave(object sender, EventArgs e)
@@ -380,9 +362,10 @@ namespace MainWindow.scheme
             }
             Paintjoin = null;
             sendParent = false;
-            if (!Current)
-                pen.Color = Color.Black;
-            OnPaint(null);
+            pen.Color = Color.Black;
+            SendToBack();
+            //OnPaint(null);
+            Refresh();
         }
 
         public void EventResize(object sender, EventArgs e)
@@ -407,9 +390,21 @@ namespace MainWindow.scheme
         {
             image.Rotate(param);
             //FIXME//DefaultSize = new Size(elem.image.Width, elem.image.Height + 2);
-            DefaultSize = new Size(image.Width, image.Height + 2);
-            Size = DefaultSize;
+            Size = new Size(image.Width, image.Height);
             Refresh();
+        }
+
+        private void InitializeComponent()
+        {
+            ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // ElemPictureBox
+            // 
+            this.WaitOnLoad = true;
+            ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
+            this.ResumeLayout(false);
+
         }
     }
 }

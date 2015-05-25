@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using MainWindow.scheme;
+using System.Runtime.InteropServices;
 
 namespace MainWindow
 {
@@ -21,15 +22,13 @@ namespace MainWindow
             
             //Parent.KeyDown += new KeyEventHandler(EventKeyDown);
             
-            MouseWheel += new MouseEventHandler(EventMouseWheel);
             lepb = new List<ElemPictureBox>();
-            DefaultSize = new Size(1500, 1000);
-            Size = DefaultSize;
+            Size = new Size(1500, 1500);
             //gr = CreateGraphics();
             cursorMode = new int[2]; 
             cursorMode[0] = 0;
             cursorMode[1] = 0;
-            maskSize = 10;
+            //maskSize = 10;
             ndriver = new NameDriver();
             pressedControl = false;
             scale = 1;
@@ -105,6 +104,36 @@ namespace MainWindow
             cwire.Dispose();
         }
 
+        const int HORZSIZE = 4;
+        const int VERTSIZE = 6;
+
+        const int HORZRES = 8;
+        const int VERTRES = 10;
+
+        [DllImport("gdi32.dll", SetLastError = true)]
+        static extern int GetDeviceCaps(
+            IntPtr hDc,
+            int index
+            );
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        public static SizeF GetPixelSizePerMM()
+        {
+            IntPtr hDC = GetDC(IntPtr.Zero);
+            float wM = (float)GetDeviceCaps(hDC, HORZRES) / (float)GetDeviceCaps(hDC, HORZSIZE);
+            float hM = (float)GetDeviceCaps(hDC, VERTRES) / (float)GetDeviceCaps(hDC, VERTSIZE);
+            ReleaseDC(IntPtr.Zero, hDC);
+
+            return new SizeF(2.0F * wM, 2.0F * hM);
+        }
+
+        public const int useGetPixelSizePerMM = 0;
+
         //private Graphics gr;
         //private List<Elems> imgs = new List<Elems>();
         /**
@@ -116,17 +145,17 @@ namespace MainWindow
          **/
         private int[] cursorMode;
         /**
-         * Размер маски в пикселях
+         * Размер маски в миллиметрах
          **/
-        public int maskSize { set; get; }
+        public Point maskSize { set; get; }
 
         private ElemPictureBox epb, cepb;
         private Elems timg;
+        private Image trimg;
         private List<ElemPictureBox> lepb;
         private Wire twire, cwire;
         private List<Wire> lwpb;
         private NameDriver ndriver;
-        private new Size DefaultSize;
         public bool pressedControl { set; get; }
         private float scale;
         private ContextMenuStrip cms, wcms;
@@ -145,9 +174,10 @@ namespace MainWindow
             cursorMode[0] = cursor;
         }
 
-        public void SetImage(Elems img)
+        public void SetImage(Elems img, Image rimg)
         {
             timg = img;
+            trimg = rimg;
             cursorMode[0] = 1;
             if (epb != null && !epb.Disposing)
             {
@@ -164,7 +194,7 @@ namespace MainWindow
 
         public Point PointToMask(Point p)
         {
-            return new Point((int)(p.X / maskSize) * maskSize, (int)(p.Y / maskSize) * maskSize);
+            return new Point((int)((int)(p.X / maskSize.X) * maskSize.X), (int)((int)(p.Y / maskSize.Y) * maskSize.Y));
         }
 
         public void EventMouseDown(object sender, MouseEventArgs e)
@@ -213,11 +243,16 @@ namespace MainWindow
                 switch (cursorMode[0])
                 {
                     case 0:
+                        if (timg == null)
+                            return;
                         cursorMode[0] = cursorMode[1];
                         cursorMode[1] = 0;
                         if (cursorMode[0] == 1)
                         {
-                            epb = new ElemPictureBox(timg, this);
+                            if (trimg != null)
+                                epb = new ElemPictureBox(timg, trimg, this);
+                            else
+                                epb = new ElemPictureBox(timg, this);
                             //Controls.Add(epb);
                         }
                         return;
@@ -251,7 +286,7 @@ namespace MainWindow
                             twire.sel = (ElemPictureBox)sender;
                         }
                         else
-                            twire = new Wire(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize), this);
+                            twire = new Wire(PointToMask(e.Location), this);
                         Controls.Add(twire);
                         //twire.Parent = this;
                         twire.BringToFront();
@@ -297,7 +332,7 @@ namespace MainWindow
                             }
                             tlw[0].eel = tnode;
                             tnode.addWire(tlw[0]);
-                            tlw[1].sel = tnode;
+                            tlw[1].eel = tnode;
                             tnode.addWire(tlw[1]);
                             twire.eel = tnode;
                             tnode.addWire(twire);
@@ -314,6 +349,7 @@ namespace MainWindow
                             if (!p.Equals(e.Location))
                                 return;
                             twire.setDone();
+                            twire.eel = sender;
                             ((Node)sender).BringToFront();
                             ((Node)sender).addWire(twire);
                             cursorMode[0] = 0;
@@ -321,7 +357,7 @@ namespace MainWindow
                             return;
                         }
                         //add point to wire
-                        twire.addPoint(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize));
+                        twire.addPoint(PointToMask(e.Location));
                         return;
                 }
             }
@@ -360,32 +396,16 @@ namespace MainWindow
             //UpdateMask();
         }
 
-        public new void Scale(float scale)
-        {
-            /*if (scale + ds - 1.0F < 0.1F || scale + ds - 1.0F > 2.0F)
-                return;
-            scale += ds - 1.0F;*/
-            //maskSize += (int)(maskSize * scale);
-            //EventSizeChanged(this, null);
-            Width = (int)(DefaultSize.Width * scale);
-            Height = (int)(DefaultSize.Height * scale);
-            UpdateMask();
-            foreach (Control control in Controls)
-                control.Scale(scale, scale);
-            //Bitmap flag = new Bitmap(Size.Width, Size.Height);
-            //this.Image = flag;
-            //Graphics gfx = Graphics.FromImage(this.Image);
-            //gfx.ResetTransform();
-            //gfx.ScaleTransform(1.3F, 1.3F);
-        }
-
         public void EventMouseEnter(object sender, EventArgs e)
         {
             //if(epb!=null)
             //MessageBox.Show(epb.Disposing.ToString());
             if (cursorMode[0] == 1 && timg != null && (epb == null || epb.Disposing))
             {
-                epb = new ElemPictureBox(timg, this);
+                if (trimg != null)
+                    epb = new ElemPictureBox(timg, trimg, this);
+                else
+                    epb = new ElemPictureBox(timg, this);
                 
                 //Controls.Add(epb);
                 //Cursor.Hide();
@@ -403,42 +423,6 @@ namespace MainWindow
             }*/
         }
 
-        public void EventMouseWheel(object sender, MouseEventArgs e)
-        {
-            if (ModifierKeys.HasFlag(Keys.Control))
-            {
-                //var element as
-                
-
-                //float delta = e.Delta / 1200F;
-                float delta = e.Delta >= 0 ? 1.1F : (1.0F / 1.1F);
-                if (Width * delta < DefaultSize.Width * 0.1F || Width * delta > DefaultSize.Width * 2.0F)
-                    return;
-                /*if (scale + delta < 0.1F || scale + delta > 2.0F)
-                    return;
-                scale += delta;*/
-
-                /*if (scale + delta - 1.0F < 0.1F || scale + delta - 1.0F > 2.0F)
-                    return;
-                scale += delta - 1.0F;*/
-                //maskSize = (int)(10 * scale);
-                /*foreach (ElemPictureBox t in lepb)
-                {
-                    //t.setScale(scale);
-                    t.Scale(new SizeF(scale, scale));
-                }*/
-                SizeF scale = new SizeF(delta, delta);
-                this.ScaleControl(scale, BoundsSpecified.Size);
-                foreach (Control control in Controls)
-                    control.Scale(scale);
-                //Scale(new SizeF(delta, delta));
-                //Location = new Point(0, 0);
-                UpdateMask();
-                //ScaleControl(new SizeF(scale, scale), BoundsSpecified.All);
-                //Scale(scale);
-            }
-        }
-
         public void EventMouseMove(object sender, MouseEventArgs e)
         {
             if (cursorMode[0] == 1)
@@ -448,12 +432,14 @@ namespace MainWindow
                   //  epb.setLocation(new Point(e.X + ((ElemPictureBox)sender).Location.X, e.Y + ((ElemPictureBox)sender).Location.Y));
                 //else
                 //FIXME//epb.setLocation(new Point((int)(e.X / maskSize) * maskSize - timg.image.TopLeft.X, (int)(e.Y / maskSize) * maskSize - timg.image.TopLeft.Y));
-                epb.setLocation(new Point((int)(e.X / maskSize) * maskSize - epb.image.TopLeft.X, (int)(e.Y / maskSize) * maskSize - epb.image.TopLeft.Y));
+                epb.setLocation(new Point((int)((int)(e.X / maskSize.X) * maskSize.X - epb.TopLeft.X),
+                    (int)((int)(e.Y / maskSize.Y) * maskSize.Y - epb.TopLeft.Y)));
+                Console.WriteLine(epb.Location.ToString());
                 //Refresh();
             }
             if (cursorMode[0] == 3)
             {
-                twire.replacePoint(new Point((int)(e.X / maskSize) * maskSize, (int)(e.Y / maskSize) * maskSize));
+                twire.replacePoint(PointToMask(e.Location));
                 Refresh();
                 return;
             }
@@ -473,18 +459,23 @@ namespace MainWindow
             //MessageBox.Show("Width:" + Size.Width + "|Height:" + Size.Height);
 
             Bitmap flag = new Bitmap(Size.Width, Size.Height);
-            maskSize = (int)(10 * (float)Size.Width / (float)DefaultSize.Width);
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
             gfx.Clear(Color.MintCream);
-            Pen pen = new Pen(Color.LightGray);
-            if (maskSize == 0)
-                return;
-            for (int i = 0; i < Size.Height; i += maskSize)
+            //gfx.PageUnit = GraphicsUnit.Millimeter;
+            SizeF ptm;
+            if (SchemePicture.useGetPixelSizePerMM == 1)
+                ptm = SchemePicture.GetPixelSizePerMM();
+            else
+                ptm = new SizeF(gfx.DpiX / 25.4F, gfx.DpiY / 25.4F);
+            //maskSize = new Point(5*(int)(1.0F * gfx.DpiX / 25.4F), 5*(int)(1.0F * gfx.DpiY / 25.4F));
+            maskSize = new Point(5 * (int)(ptm.Width), 5 * (int)(ptm.Height));
+            Pen pen = new Pen(new SolidBrush(Color.LightGray), 1.0F);
+            for (int i = 0; i < Size.Height; i += (int)maskSize.Y)
             {
                 gfx.DrawLine(pen, 0, i, Size.Width, i);
             }
-            for (int i = 0; i < Size.Width; i += maskSize)
+            for (int i = 0; i < Size.Width; i += (int)maskSize.X)
                 gfx.DrawLine(pen, i, 0, i, Size.Height);
         }
 

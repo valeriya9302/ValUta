@@ -11,11 +11,12 @@ namespace MainWindow.scheme
     /** 
      * Класс для рисования проводов на схеме
      **/
-    class Wire : PictureBox
+    public class Wire : PictureBox
     {
         public List<Point> pl { private set; get; }
         public bool isDone;
         private Color color;
+        private PointF ptm { set; get; }
         public object sel, eel;
         public Wire(Point startPoint, object parent)
         {
@@ -32,12 +33,15 @@ namespace MainWindow.scheme
             Margin = new System.Windows.Forms.Padding(0);
             color = Color.Black;
             updateRegion();
-            repaint();
+            //repaint();
+            Refresh();
             isDone = false;
+            //Visible = false;
         }
 
         public Wire(List<Point> points, object parent)
         {
+            //Visible = false;
             pl = new List<Point>(points.AsEnumerable());
             Location = new Point(0, 0);
             MouseMove += new MouseEventHandler(EventMouseMove);
@@ -47,7 +51,8 @@ namespace MainWindow.scheme
             Width = Parent.Width;
             color = Color.Black;
             updateRegion();
-            repaint();
+            //repaint();
+            Refresh();
             setDone();
         }
 
@@ -77,20 +82,23 @@ namespace MainWindow.scheme
         public void EventMouseEnter(object sender, EventArgs e)
         {
             color = Color.MediumVioletRed;
-            repaint();
+            //repaint();
+            Refresh();
         }
 
         public void EventMouseLeave(object sender, EventArgs e)
         {
             color = Color.Black;
-            repaint();
+            //repaint();
+            Refresh();
         }
 
         public void addPoint(Point point)
         {
             pl.Add(new Point(point.X, point.Y));
             updateRegion();
-            repaint();
+            //repaint();
+            Refresh();
         }
 
         public Point r2Point(Point point)
@@ -135,7 +143,8 @@ namespace MainWindow.scheme
                 pl[pl.Count - 1] = new Point(point.X, point.Y);
             }
             updateRegion();
-            repaint();
+            //repaint();
+            Refresh();
             return pl[pl.Count - 1];
         }
 
@@ -150,7 +159,8 @@ namespace MainWindow.scheme
                 tp = new Point(point.X, pl[pl.Count - 2].Y);
             pl[pl.Count - 1] = tp;
             updateRegion();
-            repaint();
+            //repaint();
+            Refresh();
             return tp;
         }
 
@@ -162,19 +172,32 @@ namespace MainWindow.scheme
             return true;
         }
 
-        public void repaint()
+        //public void repaint()
+        protected override void OnPaint(PaintEventArgs pe)
         {
-            Bitmap flag = new Bitmap(Width, Height);
+            /*Bitmap flag = new Bitmap(Width, Height);
             this.Image = flag;
             Graphics gfx = Graphics.FromImage(this.Image);
-            gfx.Clear(color);
+            ptm = new PointF(pe.Graphics.DpiX / 25.4F, pe.Graphics.DpiY / 25.4F);
+            gfx.Clear(color);*/
             //gfx.DrawLines(new Pen(Color.Black), pl.ToArray());
 
-            Refresh();
+            //Refresh();
+            if (SchemePicture.useGetPixelSizePerMM == 1)
+            {
+                SizeF tptm = SchemePicture.GetPixelSizePerMM();
+                ptm = new PointF(tptm.Width, tptm.Height);
+            }
+            else
+                ptm = new PointF(pe.Graphics.DpiX / 25.4F, pe.Graphics.DpiY / 25.4F);
+            pe.Graphics.Clear(Color.MintCream);
+            pe.Graphics.DrawLines(new Pen(color, (int)(Math.Round(ptm.X / 2.0F))), pl.ToArray());
+            //pe.Graphics.Clear(color);
         }
 
         private void updateRegion()
         {
+            Refresh();
             GraphicsPath gp = new GraphicsPath();
 
             List<Point> rect = new List<Point>();
@@ -187,10 +210,13 @@ namespace MainWindow.scheme
                 int dx = (minX == maxX) ? 1 : 0;
                 int dy = (minY == maxY) ? 1 : 0;
 
-                rect.Add(new Point(minX + dx, minY));
-                rect.Add(new Point(maxX + dx, maxY));
-                rect.Add(new Point(maxX, maxY + dy));
-                rect.Add(new Point(minX, minY + dy));
+                dx = (int)(Math.Round(dx * ptm.X / 2.0F));
+                dy = (int)(Math.Round(dy * ptm.Y / 2.0F));
+
+                rect.Add(new Point(minX + dx, minY - dy));
+                rect.Add(new Point(maxX + dx, maxY - dy));
+                rect.Add(new Point(maxX - dx, maxY + dy));
+                rect.Add(new Point(minX - dx, minY + dy));
                 //if (dx == 0)
                 //    break;
                 //Math method
@@ -210,6 +236,7 @@ namespace MainWindow.scheme
                 rect.Clear();
             }
             Region = new Region(gp);
+            Visible = true;
         }
 
         public List<Wire> split(Point point)
@@ -262,7 +289,7 @@ namespace MainWindow.scheme
                     ((ElemPictureBox)eel).addWire(list[1]);
                 if (object.ReferenceEquals(eel.GetType(), typeof(Node)))
                     ((Node)eel).addWire(list[1]);
-                list[1].eel = eel;
+                list[1].sel = eel;
             }
             return list;
         }
@@ -279,7 +306,25 @@ namespace MainWindow.scheme
                 ((SchemePicture)Parent).EventMouseDown(sender, e);
             else if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                Point tloc = ((SchemePicture)Parent).PointToMask(e.Location);
+                Point minOfset = new Point(int.MaxValue, int.MaxValue);
+                for (int i = 1; i < pl.Count; i++)
+                {
+                    if (pl[i - 1].X == pl[i].X)
+                        if ((pl[i - 1].Y >= e.Y && pl[i].Y <= e.Y) || (pl[i - 1].Y <= e.Y && pl[i].Y >= e.Y))
+                            if (Math.Abs(minOfset.X) > Math.Abs(pl[i].X - e.X))
+                                minOfset.X = pl[i].X - e.X;
+                    if (pl[i - 1].Y == pl[i].Y)
+                        if ((pl[i - 1].X >= e.X && pl[i].X <= e.X) || (pl[i - 1].X <= e.X && pl[i].X >= e.X))
+                            if (Math.Abs(minOfset.Y) > Math.Abs(pl[i].Y - e.Y))
+                                minOfset.Y = pl[i].Y - e.Y;
+                }
+                Point te;
+                if (Math.Abs(minOfset.X) > Math.Abs(minOfset.Y))
+                    te = new Point(e.X, e.Y + minOfset.Y);
+                else
+                    te = new Point(e.X + minOfset.X, e.Y);
+
+                Point tloc = ((SchemePicture)Parent).PointToMask(te);
                 Point loc = new Point();
                 for (int i = 1; i < pl.Count; i++)
                 {
@@ -291,10 +336,10 @@ namespace MainWindow.scheme
                 }
                 if (loc != tloc)
                 {
-                    if (Math.Abs((e.X - tloc.X)) > Math.Abs(e.Y - tloc.Y))
-                        loc = new Point(e.X, tloc.Y);
+                    if (Math.Abs((te.X - tloc.X)) > Math.Abs(te.Y - tloc.Y))
+                        loc = new Point(te.X, tloc.Y);
                     else
-                        loc = new Point(tloc.X, e.Y);
+                        loc = new Point(tloc.X, te.Y);
                 }
                 ((SchemePicture)Parent).EventMouseDown(sender, new MouseEventArgs(e.Button, e.Clicks, loc.X, loc.Y, e.Delta));
             }
